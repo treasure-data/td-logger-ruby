@@ -1,0 +1,43 @@
+= Treasure Data logging library for Rails
+
+= Getting Started
+
+Add the following line to your Gemfile:
+
+    gem 'td-logger'
+
+For Rails 2.x (not tested) without Bundler,
+edit +environment.rb+ and add to the initalizer block:
+
+    config.gem "td-logger"
+
+And then add +config/treasure_data.yml+ file as following:
+
+    defaults: &defaults
+      apikey: "YOUR_API_KEY"
+      database: myapp
+      auto_create_table: true
+    
+    test:
+      <<: *defaults
+    
+    development:
+      <<: *defaults
+    
+    production:
+      <<: *defaults
+
+
+    class YourController < ApplicationController
+      def myaction
+        # ...
+      end
+      td_log_action :myaction, 'mytable'
+    end
+
+
+== Copyright
+
+Copyright:: Copyright (c) 2011 Treasure Data Inc.
+License::   Apache License, Version 2.0
+
