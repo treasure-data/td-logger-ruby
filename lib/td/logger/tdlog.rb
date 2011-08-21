@@ -14,14 +14,12 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     require 'net/http'
     require 'cgi'
     require 'logger'
+    require 'td/client'
 
     @tag = tag
     @auto_create_table = auto_create_table
     @logger = ::Logger.new(STDOUT)
 
-    # TODO
-    gem 'td'
-    require 'td/client'
     @client = TreasureData::Client.new(apikey)
 
     @mutex = Mutex.new
