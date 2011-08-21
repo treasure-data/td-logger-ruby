@@ -13,20 +13,19 @@ edit +environment.rb+ and add to the initalizer block:
 
 And then add +config/treasure_data.yml+ file as following:
 
-    defaults: &defaults
+    # logging to Treasure Data directry
+    development:
       apikey: "YOUR_API_KEY"
       database: myapp
       auto_create_table: true
     
-    test:
-      <<: *defaults
-    
-    development:
-      <<: *defaults
-    
+    # logging using td-agent
     production:
-      <<: *defaults
-
+      agent: "localhost:24224"
+      tag: myapp
+    
+    # disable logging
+    test:
 
 == Logging actions
 
@@ -48,6 +47,10 @@ You can add environment variables by adding 'extra' option as follows:
 
     # logs referer and path info
     add_td_tracer :myaction, 'mytable', :extra=>{:HTTP_REFERER=>:referer, :PATH_INFO=>:path}
+
+Add 'static' option to add constant key-value pairs:
+
+    add_td_tracer :myaction, 'mytable', :static=>{:version=>1}
 
 
 == Copyright

@@ -13,14 +13,14 @@ class Config
 
       @tag = conf['tag']
       @tag ||= conf['database']
-      raise "'tag' or 'database' option is required" unless @tag
+      raise "'tag' nor 'database' options are not set" unless @tag
 
     else
       @apikey = conf['apikey']
-      raise "'apikey' option is required" unless @apikey
+      raise "'apikey' option is not set" unless @apikey
 
       @database = conf['database']
-      raise "'database' option is required" unless @database
+      raise "'database' option is not set" unless @database
 
       @auto_create_table = !!conf['auto_create_table']
     end
@@ -108,7 +108,8 @@ def self.read_config(rails)
   begin
     return Config.new(conf)
   rescue
-    logger.warn "#{CONFIG_PATH}: #{$!}"
+    logger.warn "#{CONFIG_PATH}: #{$!}."
+    logger.warn "Disabling Treasure Data logger."
     return
   end
 end
