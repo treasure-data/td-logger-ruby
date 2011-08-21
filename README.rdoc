@@ -1,6 +1,6 @@
 = Treasure Data logging library for Rails
 
-= Getting Started
+== Getting Started
 
 Add the following line to your Gemfile:
 
@@ -19,7 +19,7 @@ And then add +config/treasure_data.yml+ file as following:
       database: myapp
       auto_create_table: true
     
-    # logging using td-agent
+    # logging via td-agent
     production:
       agent: "localhost:24224"
       tag: myapp
@@ -27,7 +27,7 @@ And then add +config/treasure_data.yml+ file as following:
     # disable logging
     test:
 
-== Logging actions
+=== Logging actions
 
 Add 'add_td_tracer' line to your controller classes:
 
@@ -38,7 +38,7 @@ Add 'add_td_tracer' line to your controller classes:
       add_td_tracer :myaction, 'mytable'
     end
 
-It logs {"controller":"your","action":"myaction"} entry. additional, routing parameters are included automatically.
+It logs {"controller":"your","action":"myaction"}. Additionally, routing parameters are included automatically.
 
 You can add environment variables by adding 'extra' option as follows:
 

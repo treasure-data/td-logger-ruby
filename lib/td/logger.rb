@@ -102,6 +102,7 @@ def self.read_config(rails)
   conf = yaml[RAILS_ENV]
   unless conf
     logger.warn "#{CONFIG_PATH} doesn't include setting for current environment (#{RAILS_ENV})."
+    logger.warn "Disabling Treasure Data logger."
     return
   end
 
