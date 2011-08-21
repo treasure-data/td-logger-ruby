@@ -30,14 +30,24 @@ And then add +config/treasure_data.yml+ file as following:
 
 == Logging actions
 
-Add 'td_log_action' line to your controller classes:
+Add 'add_td_tracer' line to your controller classes:
 
     class YourController < ApplicationController
       def myaction
         # ...
       end
-      td_log_action :myaction, 'mytable'
+      add_td_tracer :myaction, 'mytable'
     end
+
+It logs {"controller":"your","action":"myaction"} entry. additional, routing parameters are included automatically.
+
+You can add environment variables by adding 'extra' option as follows:
+
+    # logs client address on the 'addr' column
+    add_td_tracer :myaction, 'mytable', :extra=>{:REMOTE_ADDR=>:addr}
+
+    # logs referer and path info
+    add_td_tracer :myaction, 'mytable', :extra=>{:HTTP_REFERER=>:referer, :PATH_INFO=>:path}
 
 
 == Copyright
