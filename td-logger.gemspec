@@ -11,7 +11,8 @@ Gem::Specification.new do |s|
   s.authors = ["Sadayuki Furuhashi"]
   s.date = %q{2011-08-21}
   s.extra_rdoc_files = [
-    "README.rdoc"
+    "ChangeLog",
+     "README.rdoc"
   ]
   s.files = [
     "lib/td/logger.rb",
