@@ -162,7 +162,7 @@ module ControllerLogger
       @extra = nil
       @static = {}
 
-      if o = options[:only]
+      if o = options[:only_params]
         @only = case o
           when Array
             o
@@ -171,7 +171,7 @@ module ControllerLogger
           end.map {|e| e.to_s }
       end
 
-      if o = options[:except]
+      if o = options[:except_params]
         @except = case o
           when Array
             o
@@ -227,19 +227,19 @@ module ControllerLogger
   end
 
   module ModuleMethods
-    def td_log_action(method, tag, options={})
+    def add_td_tracer(method, tag, options={})
       al = ActionLogger.new(method, tag, options)
       module_eval <<-EOF
-        def #{method}_td_log_action_(*args, &block)
-          ::TreasureData::Logger::RailsAgent::Middleware.set_log_method(request.env, method(:#{method}_td_log_action_log_))
-          #{method}_td_log_action_orig_(*args, &block)
+        def #{method}_td_action_tracer_(*args, &block)
+          ::TreasureData::Logger::RailsAgent::Middleware.set_log_method(request.env, method(:#{method}_td_action_trace_))
+          #{method}_td_action_tracer_orig_(*args, &block)
         end
       EOF
       module_eval do
-        define_method(:"#{method}_td_log_action_log_", &al.method(:call))
+        define_method(:"#{method}_td_action_trace_", &al.method(:call))
       end
-      alias_method "#{method}_td_log_action_orig_", method
-      alias_method method, "#{method}_td_log_action_"
+      alias_method "#{method}_td_action_tracer_orig_", method
+      alias_method method, "#{method}_td_action_tracer_"
     end
   end
 end
