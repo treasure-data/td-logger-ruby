@@ -28,6 +28,10 @@ And then add +config/treasure_data.yml+ file as following:
       <<: *defaults
 
 
+== Logging actions
+
+Add 'td_log_action' line to your controller classes:
+
     class YourController < ApplicationController
       def myaction
         # ...
