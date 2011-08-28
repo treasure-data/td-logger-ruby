@@ -13,44 +13,85 @@ edit +environment.rb+ and add to the initalizer block:
 
 And then add +config/treasure_data.yml+ file as following:
 
-    # logging to Treasure Data directry
+    # logging to Treasure Data directly
     development:
       apikey: "YOUR_API_KEY"
       database: myapp
+      access_log_table: access
       auto_create_table: true
     
     # logging via td-agent
     production:
       agent: "localhost:24224"
-      tag: myapp
+      tag: td.myapp
+      access_log_table: access
     
     # disable logging
     test:
 
-=== Logging actions
+=== Logging access logs
 
-Add 'add_td_tracer' line to your controller classes:
+Following information will be logged automatically:
+
+* controller name ('controller' column)
+* action name ('action' column)
+* remote host ip address ('remote_addr' column)
+* http status code ('status' column)
+* http referer ('refer' column)
+
+To add information to the log, call 'td_access_log' method in a Controller:
 
     class YourController < ApplicationController
       def myaction
-        # ...
+        td_access_log[:column] = "value"
       end
-      add_td_tracer :myaction, 'mytable'
     end
 
-It logs {"controller":"your","action":"myaction"}. Additionally, routing parameters are included automatically.
+Or call 'TreasureData.access_log' method outside of a Controller:
 
-You can add environment variables by adding 'extra' option as follows:
+    class MyHelperModule
+      def mymethod
+        TreasureData.access_log[:column] = "value"
+      end
+    end
 
-    # logs client address on the 'addr' column
-    add_td_tracer :myaction, 'mytable', :extra=>{:REMOTE_ADDR=>:addr}
 
-    # logs referer and path info
-    add_td_tracer :myaction, 'mytable', :extra=>{:HTTP_REFERER=>:referer, :PATH_INFO=>:path}
+=== Logging model changes
+
+Add 'td_enable_model_tracer' line to your Model class:
+
+    class MyModel < ActiveRecord::Base
+      td_enable_model_tracer :mytable
+    end
+
+It logs all columns when the model is changed. Use :only option to limit columns to log:
+
+    class MyModel < ActiveRecord::Base
+      td_enable_model_tracer :mytable, :only => [:id, :mycol]
+    end
+
+Alternatively, use :except option to except columns to log:
+
+    class MyModel < ActiveRecord::Base
+      td_enable_model_tracer :mytable, :except => [:created_at]
+    end
 
 Add 'static' option to add constant key-value pairs:
 
-    add_td_tracer :myaction, 'mytable', :static=>{:version=>1}
+    class MyModel < ActiveRecord::Base
+      td_enable_model_tracer :mytable, :except => [:created_at], :static => {'model'=>'my'}
+    end
+
+
+=== Logging other logs
+
+You can log anytime using 'TreasureData.log' method:
+
+    class MyClass
+      def mymethod
+        TreasureData.log('mytable', {:col1=>"val1", :col2=>"val2"}
+      end
+    end
 
 
 == Copyright

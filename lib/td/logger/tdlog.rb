@@ -2,7 +2,7 @@
 module TreasureData
 module Logger
 
-# TODO shutdown handler
+# TODO shutdown handler  (deadlock)
 
 class TreasureDataLogger < Fluent::Logger::LoggerBase
   def initialize(apikey, tag, auto_create_table)
@@ -116,6 +116,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     until @queue.empty?
       tuple = @queue.first
 
+      puts "uploading... #{tuple}"
       begin
         upload(*tuple)
         @queue.shift
