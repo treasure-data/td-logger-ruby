@@ -1,4 +1,12 @@
 
+== 2011-08-28 version 0.2.0
+
+* Rewritten
+* Supported access logging: td_access_log or TreasureData.access_log
+* Supported model change logging: td_enable_model_tracer
+* Supported other logging: TreasureData.log
+
+
 == 2011-08-21 version 0.1.1
 
 * Updated library dependencies

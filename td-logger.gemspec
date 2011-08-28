@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{td-logger}
-  s.version = "0.1.2"
+  s.version = "0.2.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Sadayuki Furuhashi"]
-  s.date = %q{2011-08-21}
+  s.date = %q{2011-08-28}
   s.extra_rdoc_files = [
     "ChangeLog",
      "README.rdoc"
@@ -17,6 +17,11 @@ Gem::Specification.new do |s|
   s.files = [
     "lib/td-logger.rb",
      "lib/td/logger.rb",
+     "lib/td/logger/agent/access_log.rb",
+     "lib/td/logger/agent/middleware.rb",
+     "lib/td/logger/agent/rails.rb",
+     "lib/td/logger/agent/rails/controller.rb",
+     "lib/td/logger/agent/rails/model.rb",
      "lib/td/logger/tdlog.rb",
      "lib/td/logger/version.rb"
   ]
