@@ -46,24 +46,30 @@ module Agent
           }
         end
 
-        m = defined?(after_commit) ? :after_commit : :after_save
+        if defined?(after_commit)
+          # Rails 3
+          m = :after_commit
+        else
+          # Rails 2
+          m = :after_save
+        end
 
         __send__(m) do |record|
-          m = {}
+          data = {}
           record.attribute_names.each {|name|
             name = name.to_s
             if (!only || only.include?(name)) && (!except || !except.include?(name))
-              m[name] = record.read_attribute(name)
+              data[name] = record.read_attribute(name)
             end
           }
           static.each_pair {|k,v|
-            m[k] = v
+            data[k] = v
           }
-          if time = m['updated_at'] && time.is_a?(Time)
-            m['time'] = time.to_i
-            m.delete('updated_at')
+          if time = data['updated_at'] && time.is_a?(Time)
+            data['time'] = time.to_i
+            data.delete('updated_at')
           end
-          TreasureData.log(tag, m)
+          TreasureData.log(tag, data)
         end
       end
     end

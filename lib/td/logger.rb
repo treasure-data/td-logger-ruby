@@ -4,7 +4,7 @@ module TreasureData
 
 def self.open(apikey, database, auto_create_table=false)
   require 'td/logger/tdlog'
-  TreasureDataLogger.open(apikey, database, auto_create_table)
+  TreasureData::Logger::TreasureDataLogger.open(apikey, database, auto_create_table)
 end
 
 def self.open_agent(tag, agent_host, agent_port)

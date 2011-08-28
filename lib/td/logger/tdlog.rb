@@ -116,7 +116,6 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     until @queue.empty?
       tuple = @queue.first
 
-      puts "uploading... #{tuple}"
       begin
         upload(*tuple)
         @queue.shift
