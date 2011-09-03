@@ -23,8 +23,11 @@ module Agent
   }
 
   ACCESS_LOG_PRESET_ENV_KEYS = {
-    'remote_addr' => 'REMOTE_ADDR',
+    'ip'      => 'REMOTE_ADDR',
+    'method'  => 'REQUEST_METHOD',
+    'uri'     => 'REQUEST_URI',
     'referer' => 'HTTP_REFERER',
+    'ua'      => 'HTTP_USER_AGENT'
   }
 
   def self.enable_access_log(tag)
