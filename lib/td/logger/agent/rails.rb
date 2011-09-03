@@ -28,6 +28,22 @@ production:
 test:
 EOF
 
+    def self.rails_env
+      if defined?(RAILS_ENV) && RAILS_ENV.to_s != ''
+        RAILS_ENV.to_s
+      else
+        ::Rails.env
+      end
+    end
+    
+    def self.rails_root
+      if defined?(RAILS_ROOT) && RAILS_ROOT.to_s != ''
+        RAILS_ROOT.to_s
+      else
+        ::Rails.root
+      end
+    end
+
     class Config
       def initialize(conf)
         if agent = conf['agent']
@@ -69,7 +85,7 @@ EOF
     def self.read_config(rails)
       logger = ::Rails.logger || ::Logger.new(STDOUT)
       begin
-        yaml = YAML.load_file("#{RAILS_ROOT}/#{CONFIG_PATH}")
+        yaml = YAML.load_file("#{rails_root}/#{CONFIG_PATH}")
       rescue
         logger.warn "Can't load #{CONFIG_PATH} file."
         logger.warn "  #{$!}"
@@ -78,9 +94,9 @@ EOF
         return
       end
 
-      conf = yaml[RAILS_ENV]
+      conf = yaml[rails_env]
       unless conf
-        logger.warn "#{CONFIG_PATH} doesn't include setting for current environment (#{RAILS_ENV})."
+        logger.warn "#{CONFIG_PATH} doesn't include setting for current environment (#{rails_env})."
         logger.warn "Disabling Treasure Data logger."
         return
       end
