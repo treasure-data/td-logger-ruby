@@ -18,8 +18,8 @@ module Agent
         end
 
   ACCESS_LOG_PRESET_PARAM_KEYS = {
-    'controller' => 'controller',
-    'action' => 'action',
+    'controller' => :controller,
+    'action' => :action,
   }
 
   ACCESS_LOG_PRESET_ENV_KEYS = {
