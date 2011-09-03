@@ -74,7 +74,7 @@ EOF
         logger.warn "Can't load #{CONFIG_PATH} file."
         logger.warn "  #{$!}"
         logger.warn "Put the following file:"
-        logger.warn sample
+        logger.warn CONFIG_SAMPLE
         return
       end
 
