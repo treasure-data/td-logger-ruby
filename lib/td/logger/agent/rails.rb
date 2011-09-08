@@ -83,9 +83,13 @@ EOF
     end
 
     def self.read_config(rails)
+      require 'yaml'
+      require 'erb'
       logger = ::Rails.logger || ::Logger.new(STDOUT)
       begin
-        yaml = YAML.load_file("#{rails_root}/#{CONFIG_PATH}")
+        src = File.read("#{rails_root}/#{CONFIG_PATH}")
+        yaml = ERB.new(src).result
+        env_conf = YAML.load(yaml)
       rescue
         logger.warn "Can't load #{CONFIG_PATH} file."
         logger.warn "  #{$!}"
@@ -94,7 +98,7 @@ EOF
         return
       end
 
-      conf = yaml[rails_env]
+      conf = env_conf[rails_env]
       unless conf
         logger.warn "#{CONFIG_PATH} doesn't include setting for current environment (#{rails_env})."
         logger.warn "Disabling Treasure Data logger."
