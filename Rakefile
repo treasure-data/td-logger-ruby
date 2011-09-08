@@ -6,7 +6,7 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gemspec|
     gemspec.name = "td-logger"
-    gemspec.summary = "Treasure Data logging library fro Rails"
+    gemspec.summary = "Treasure Data logging library for Rails"
     gemspec.authors = ["Sadayuki Furuhashi"]
     #gemspec.email = "frsyuki@users.sourceforge.jp"
     #gemspec.homepage = "http://example.com/"
