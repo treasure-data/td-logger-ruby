@@ -18,7 +18,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
 
     @tag = tag
     @auto_create_table = auto_create_table
-    @logger = ::Logger.new(STDOUT)
+    @logger = ::Logger.new(STDERR)
 
     @client = TreasureData::Client.new(apikey)
 

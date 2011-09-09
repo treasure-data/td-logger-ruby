@@ -85,7 +85,7 @@ EOF
     def self.read_config(rails)
       require 'yaml'
       require 'erb'
-      logger = ::Rails.logger || ::Logger.new(STDOUT)
+      logger = ::Rails.logger || ::Logger.new(STDERR)
       begin
         src = File.read("#{rails_root}/#{CONFIG_PATH}")
         yaml = ERB.new(src).result
