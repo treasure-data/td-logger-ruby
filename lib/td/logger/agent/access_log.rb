@@ -35,10 +35,20 @@ module Agent
       data = {}
       Thread.current['td.access_log'] = data
       env['td.access_log'] = data
+      env['td.access_time'] = Time.now
     end
 
     Middleware.after do |env,result|
       data = env['td.access_log'] || {}
+      access_time = env['td.access_time']
+
+      # add 'elapsed' column
+      if access_time
+        elapsed = Time.now - access_time
+        data['elapsed'] = elapsed
+        # set 'time' column to access time
+        data['time'] = access_time
+      end
 
       ACCESS_LOG_PRESET_ENV_KEYS.each_pair {|key,val|
         data[key] ||= env[val] if env[val]
