@@ -28,7 +28,8 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     @queue = []
 
     @chunk_limit = 8*1024*1024
-    @flush_interval = 300
+    @flush_interval = 10
+    @max_flush_interval = 300
     @retry_wait = 1.0
     @retry_limit = 8
 
@@ -77,7 +78,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     if @next_time <= now || (@flush_now && @error_count == 0)
       @mutex.unlock
       begin
-        try_flush
+        flushed = try_flush
       ensure
         @mutex.lock
       end
@@ -85,6 +86,9 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     end
 
     if @error_count == 0
+      if flushed && @flush_interval < @max_flush_interval
+        @flush_interval = [@flush_interval + 60, @max_flush_interval].min
+      end
       next_wait = @flush_interval
     else
       next_wait = @retry_wait * (2 ** (@error_count-1))
@@ -113,6 +117,8 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
       end
     end
 
+    flushed = false
+
     until @queue.empty?
       tuple = @queue.first
 
@@ -120,6 +126,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
         upload(*tuple)
         @queue.shift
         @error_count = 0
+        flushed = true
       rescue
         if @error_count < @retry_limit
           @logger.error "Failed to upload logs to Treasure Data, retrying: #{$!}"
@@ -135,6 +142,8 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
         return
       end
     end
+
+    flushed
   end
 
   def upload(db, table, buffer)
