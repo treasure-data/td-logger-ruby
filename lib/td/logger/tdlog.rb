@@ -28,7 +28,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     @queue = []
 
     @chunk_limit = 8*1024*1024
-    @flush_interval = 60
+    @flush_interval = 300
     @retry_wait = 1.0
     @retry_limit = 8
 
