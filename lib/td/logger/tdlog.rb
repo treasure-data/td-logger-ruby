@@ -2,9 +2,27 @@
 module TreasureData
 module Logger
 
-# TODO shutdown handler  (deadlock)
 
 class TreasureDataLogger < Fluent::Logger::LoggerBase
+  module Finalizable
+    require 'delegate'
+    def new(*args, &block)
+      obj = allocate
+      obj.instance_eval { initialize(*args, &block) }
+      dc = DelegateClass(obj.class).new(obj)
+      ObjectSpace.define_finalizer(dc, finalizer(obj))
+      dc
+    end
+
+    def finalizer(obj)
+      fin = obj.method(:finalize)
+      proc {|id|
+        fin.call
+      }
+    end
+  end
+  extend Finalizable
+
   def initialize(apikey, tag, auto_create_table)
     require 'thread'
     require 'stringio'
@@ -71,32 +89,32 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
   end
 
   def upload_main
-  @mutex.lock
-  until @finish
-    now = Time.now.to_i
+    @mutex.lock
+    until @finish
+      now = Time.now.to_i
 
-    if @next_time <= now || (@flush_now && @error_count == 0)
-      @mutex.unlock
-      begin
-        flushed = try_flush
-      ensure
-        @mutex.lock
+      if @next_time <= now || (@flush_now && @error_count == 0)
+        @mutex.unlock
+        begin
+          flushed = try_flush
+        ensure
+          @mutex.lock
+        end
+        @flush_now = false
       end
-      @flush_now = false
-    end
 
-    if @error_count == 0
-      if flushed && @flush_interval < @max_flush_interval
-        @flush_interval = [@flush_interval + 60, @max_flush_interval].min
+      if @error_count == 0
+        if flushed && @flush_interval < @max_flush_interval
+          @flush_interval = [@flush_interval + 60, @max_flush_interval].min
+        end
+        next_wait = @flush_interval
+      else
+        next_wait = @retry_wait * (2 ** (@error_count-1))
       end
-      next_wait = @flush_interval
-    else
-      next_wait = @retry_wait * (2 ** (@error_count-1))
-    end
-    @next_time = next_wait + now
+      @next_time = next_wait + now
 
-    cond_wait(next_wait)
-  end
+      cond_wait(next_wait)
+    end
 
   rescue
     @logger.error "Unexpected error: #{$!}"
@@ -129,10 +147,10 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
         flushed = true
       rescue
         if @error_count < @retry_limit
-          @logger.error "Failed to upload logs to Treasure Data, retrying: #{$!}"
+          @logger.error "Failed to import logs to Treasure Data, retrying: #{$!}"
           @error_count += 1
         else
-          @logger.error "Failed to upload logs to Treasure Data, trashed: #{$!}"
+          @logger.error "Failed to import logs to Treasure Data, trashed: #{$!}"
           $!.backtrace.each {|bt|
             @logger.info bt
           }
@@ -147,11 +165,12 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
   end
 
   def upload(db, table, buffer)
-    out = StringIO.new
-    Zlib::GzipWriter.wrap(out) {|gz| gz.write buffer }
-    stream = StringIO.new(out.string)
-
+    @logger.debug "Importing logs to #{db}.#{table} table on TreasureData"
     begin
+      out = StringIO.new
+      Zlib::GzipWriter.wrap(out) {|gz| gz.write buffer }
+      stream = StringIO.new(out.string)
+
       @client.import(db, table, "msgpack.gz", stream, stream.size)
     rescue TreasureData::NotFoundError
       unless @auto_create_table
@@ -168,8 +187,13 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     end
   end
 
-  def e(s)
-    CGI.escape(s.to_s)
+  def finalize
+    @map.each {|(db,table),buffer|
+      upload(db, table, buffer)
+    }
+    @queue.each {|tuple|
+      upload(*tuple)
+    }
   end
 
   if ConditionVariable.new.method(:wait).arity == 1
