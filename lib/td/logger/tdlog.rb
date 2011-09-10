@@ -36,7 +36,9 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
 
     @tag = tag
     @auto_create_table = auto_create_table
+
     @logger = ::Logger.new(STDERR)
+    @logger.level = ::Logger::INFO
 
     @client = TreasureData::Client.new(apikey)
 
@@ -60,11 +62,21 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
   attr_accessor :logger
 
   def close
-    @finish = true
-    @mutex.synchronize {
-      @flush_now = true
-      @cond.signal
-    }
+    unless @finish
+      @finish = true
+      @mutex.synchronize {
+        @flush_now = true
+        @cond.signal
+      }
+      @upload_thread.join
+
+      @map.each {|(db,table),buffer|
+        upload(db, table, buffer)
+      }
+      @queue.each {|tuple|
+        upload(*tuple)
+      }
+    end
   end
 
   def post(tag, record)
@@ -188,12 +200,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
   end
 
   def finalize
-    @map.each {|(db,table),buffer|
-      upload(db, table, buffer)
-    }
-    @queue.each {|tuple|
-      upload(*tuple)
-    }
+    close
   end
 
   if ConditionVariable.new.method(:wait).arity == 1
