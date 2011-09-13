@@ -86,14 +86,31 @@ EOF
       require 'yaml'
       require 'erb'
       logger = ::Rails.logger || ::Logger.new(STDERR)
+
+      unless File.exist?(CONFIG_PATH)
+        apikey = ENV['TREASURE_DATA_API_KEY'] || ENV['TD_API_KEY']
+        unless apikey
+          logger.warn "TREASURE_DATA_API_KEY environment variable is not set"
+          logger.warn "#{CONFIG_PATH} does not exist."
+          logger.warn "Disabling Treasure Data logger."
+          return
+        end
+        return Config.new({
+          'apikey' => apikey,
+          'database' => ENV['TREASURE_DATA_DB'] || "rails_#{rails_env}",
+          'access_log_table' => ENV['TREASURE_DATA_TABLE'] || 'web_access',
+          'auto_create_table' => true
+        })
+      end
+
       begin
         src = File.read("#{rails_root}/#{CONFIG_PATH}")
         yaml = ERB.new(src).result
         env_conf = YAML.load(yaml)
       rescue
-        logger.warn "Can't load #{CONFIG_PATH} file."
-        logger.warn "  #{$!}"
-        logger.warn "Put the following file:"
+        logger.warn "Can't load #{CONFIG_PATH} file: #{$!}"
+        logger.warn "Disabling Treasure Data logger."
+        logger.warn "Example:"
         logger.warn CONFIG_SAMPLE
         return
       end
