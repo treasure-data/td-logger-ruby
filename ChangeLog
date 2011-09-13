@@ -1,4 +1,14 @@
 
+== 2011-09-13 version 0.2.4
+
+* Increase flush_interval from 10 sec to 5 mins gradually
+* Flush buffered logs when Rails stops
+* Adds 'elapsed' column to access logs
+* Use TREASURE_DATA_API_KEY environment variable by default
+* Enable event logger if apikey is available with default database name
+  and access log table name
+
+
 == 2011-09-08 version 0.2.3
 
 * Loggers use STDERR instead of STDOUT
