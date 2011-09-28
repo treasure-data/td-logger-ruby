@@ -4,29 +4,35 @@ module Agent
   module Rails
 
     def self.init_controller
-      ms = ControllerMethods
-      modms = ControllerModuleMethods
-      ActionController::Base.class_eval do
-        include ms
-        extend modms
-      end
+      ActionController::Base.send(:include, ControllerExtension)
     end
 
-    module ControllerMethods
-      def td_access_log
-        request.env['td.access_log'] ||= {}
+    module ControllerExtension
+      if defined?(ActiveSupport::Concern)
+        # Rails 2
+        extend ActiveSupport::Concern
+      else
+        def self.included(mod)
+          im = InstanceMethods
+          cm = ClassMethods
+          mod.class_eval do
+            include im
+            extend cm
+          end
+        end
       end
-    end
 
-    module ControllerModuleMethods
+      module InstanceMethods
+        def td_access_log
+          request.env['td.access_log'] ||= {}
+        end
+      end
+
+      module ClassMethods
+      end
     end
 
   end
 end
 end
-
-def self.access_log
-  Thread.current['td.access_log']
-end
-
 end

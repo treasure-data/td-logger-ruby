@@ -4,8 +4,8 @@ module Logger
 module Agent
 
   ACCESS_LOG_PARAM_ENV =
-        if defined? Rails
-          if Rails.respond_to?(:version) && Rails.version =~ /^3/
+        if defined? ::Rails
+          if ::Rails.respond_to?(:version) && ::Rails.version =~ /^3/
             # Rails 3
             'action_dispatch.request.path_parameters'
           else
@@ -70,4 +70,10 @@ module Agent
 
 end
 end
+end
+
+module TreasureData
+  def self.access_log
+    Thread.current['td.access_log']
+  end
 end

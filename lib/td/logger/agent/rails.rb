@@ -1,11 +1,6 @@
 module TreasureData
 module Logger
 module Agent
-  require 'td/logger/agent/middleware'
-  require 'td/logger/agent/access_log'
-  require 'td/logger/agent/rails/controller'
-  require 'td/logger/agent/rails/model'
-
   module Rails
 
     CONFIG_PATH = 'config/treasure_data.yml'
@@ -132,6 +127,11 @@ EOF
     end
 
     def self.init(rails)
+      require 'td/logger/agent/middleware'
+      require 'td/logger/agent/access_log'
+      require 'td/logger/agent/rails/controller'
+      require 'td/logger/agent/rails/model'
+
       c = read_config(rails)
       return unless c
 
@@ -155,17 +155,17 @@ end
 end
 end
 
-if defined? Rails
-  if Rails.respond_to?(:version) && Rails.version =~ /^3/
+if defined? ::Rails
+  if ::Rails.respond_to?(:version) && ::Rails.version =~ /^3/
     module TreasureData
-      class Railtie < Rails::Railtie
+      class Railtie < ::Rails::Railtie
         initializer "treasure_data_agent.start_plugin" do |app|
           TreasureData::Logger::Agent::Rails.init(app.config)
         end
       end
     end
   else
-    TreasureData::Logger::Agent::Rails.init(Rails.configuration)
+    TreasureData::Logger::Agent::Rails.init(::Rails.configuration)
   end
 end
 
