@@ -22,14 +22,6 @@ module Agent
     'action' => :action,
   }
 
-  ACCESS_LOG_PRESET_ENV_KEYS = {
-    'method'  => 'REQUEST_METHOD',
-    'uri'     => 'REQUEST_URI',
-    'referer' => 'HTTP_REFERER',
-    'ua'      => 'HTTP_USER_AGENT'
-    #'ip'     => 'REMOTE_ADDR',
-  }
-
   def self.enable_access_log(tag)
     Middleware.before do |env|
       data = {}
@@ -39,33 +31,40 @@ module Agent
     end
 
     Middleware.after do |env,result|
-      data = env['td.access_log'] || {}
-      access_time = env['td.access_time']
-
-      # add 'elapsed' column
-      if access_time
-        elapsed = Time.now - access_time
-        data['elapsed'] = elapsed
-        # set 'time' column to access time
-        data['time'] = access_time
+      req = env['action_dispatch.request']
+      if !req || !req.is_a?(Rack::Request)
+        req = Rack::Request.new(env)
       end
 
-      ACCESS_LOG_PRESET_ENV_KEYS.each_pair {|key,val|
-        data[key] ||= env[val] if env[val]
-      }
-      if ip = env['HTTP_X_FORWARDED_FOR'] || env['REMOTE_ADDR']
-        data['ip'] ||= ip
+      # ignore OPTIONS request
+      if req.request_method != "OPTIONS"
+        data = env['td.access_log'] || {}
+        access_time = env['td.access_time']
+
+        # add 'elapsed' column
+        if access_time
+          elapsed = Time.now - access_time
+          data['elapsed'] = elapsed
+          # set 'time' column to access time
+          data['time'] = access_time
+        end
+
+        data['method'] ||= req.request_method
+        data['ip'] ||= (env['action_dispatch.remote_ip'] || req.ip).to_s
+        data['uri'] ||= env['REQUEST_URI'].to_s if env['REQUEST_URI']
+        data['referer'] ||= env['HTTP_REFERER'].to_s if env['HTTP_REFERER']
+        data['ua'] ||= env['HTTP_USER_AGENT'].to_s if env['HTTP_USER_AGENT']
+
+        m = env[ACCESS_LOG_PARAM_ENV]
+        ACCESS_LOG_PRESET_PARAM_KEYS.each_pair {|key,val|
+          data[key] ||= m[val] if m[val]
+        }
+
+        # result code
+        data['status'] ||= result[0].to_i
+
+        TreasureData.log(tag, data)
       end
-
-      m = env[ACCESS_LOG_PARAM_ENV]
-      ACCESS_LOG_PRESET_PARAM_KEYS.each_pair {|key,val|
-        data[key] ||= m[val] if m[val]
-      }
-
-      # result code
-      data['status'] ||= result[0].to_i
-
-      TreasureData.log(tag, data)
     end
   end
 
