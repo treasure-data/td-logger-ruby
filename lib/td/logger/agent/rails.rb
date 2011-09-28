@@ -23,22 +23,6 @@ production:
 test:
 EOF
 
-    def self.rails_env
-      if defined?(RAILS_ENV) && RAILS_ENV.to_s != ''
-        RAILS_ENV.to_s
-      else
-        ::Rails.env
-      end
-    end
-    
-    def self.rails_root
-      if defined?(RAILS_ROOT) && RAILS_ROOT.to_s != ''
-        RAILS_ROOT.to_s
-      else
-        ::Rails.root
-      end
-    end
-
     class Config
       def initialize(conf)
         if agent = conf['agent']
@@ -92,14 +76,14 @@ EOF
         end
         return Config.new({
           'apikey' => apikey,
-          'database' => ENV['TREASURE_DATA_DB'] || "rails_#{rails_env}",
+          'database' => ENV['TREASURE_DATA_DB'] || "rails_#{::Rails.env}",
           'access_log_table' => ENV['TREASURE_DATA_TABLE'] || 'web_access',
           'auto_create_table' => true
         })
       end
 
       begin
-        src = File.read("#{rails_root}/#{CONFIG_PATH}")
+        src = File.read("#{::Rails.root}/#{CONFIG_PATH}")
         yaml = ERB.new(src).result
         env_conf = YAML.load(yaml)
       rescue
@@ -110,9 +94,9 @@ EOF
         return
       end
 
-      conf = env_conf[rails_env]
+      conf = env_conf[::Rails.env]
       unless conf
-        logger.warn "#{CONFIG_PATH} doesn't include setting for current environment (#{rails_env})."
+        logger.warn "#{CONFIG_PATH} doesn't include setting for current environment (#{::Rails.env})."
         logger.warn "Disabling Treasure Data logger."
         return
       end
