@@ -23,11 +23,11 @@ module Agent
   }
 
   ACCESS_LOG_PRESET_ENV_KEYS = {
-    'ip'      => 'REMOTE_ADDR',
     'method'  => 'REQUEST_METHOD',
     'uri'     => 'REQUEST_URI',
     'referer' => 'HTTP_REFERER',
     'ua'      => 'HTTP_USER_AGENT'
+    #'ip'     => 'REMOTE_ADDR',
   }
 
   def self.enable_access_log(tag)
@@ -53,6 +53,9 @@ module Agent
       ACCESS_LOG_PRESET_ENV_KEYS.each_pair {|key,val|
         data[key] ||= env[val] if env[val]
       }
+      if ip = env['HTTP_X_FORWARDED_FOR'] || env['REMOTE_ADDR']
+        data['ip'] ||= ip
+      end
 
       m = env[ACCESS_LOG_PARAM_ENV]
       ACCESS_LOG_PRESET_PARAM_KEYS.each_pair {|key,val|
