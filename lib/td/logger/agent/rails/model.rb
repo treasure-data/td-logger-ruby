@@ -4,9 +4,9 @@ module Agent
   module Rails
 
     def self.init_model
+      return unless defined?(ActiveRecord)
       ms = ModelMethods
       modms = ModelModuleMethods
-      require 'active_record' unless defined?(ActiveRecord)
       ActiveRecord::Base.class_eval do
         include ms
         extend modms
