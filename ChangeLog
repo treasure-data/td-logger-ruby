@@ -1,4 +1,13 @@
 
+== 2011-09-30 version 0.2.5
+
+* Use HTTP_X_FORWARDED_FOR instead of REMOTE_ADDR if it's available
+* Don't enable ActiveRecord extension unless defined?(ActiveRecord)
+* Ignore OPTIONS method
+* Use Symbol for keys of access log
+* Removed defined?(RAILS_ENV) and defined?(RAILS_ROOT) to suppress wornings
+
+
 == 2011-09-13 version 0.2.4
 
 * Increase flush_interval from 10 sec to 5 mins gradually
