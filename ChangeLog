@@ -1,4 +1,14 @@
 
+== 2011-10-06 version 0.2.6
+
+* Divided 'uri' column into 'path' and 'host' columns in access logs
+* Access log merges params which are not filtered by config.filter_parameters
+* Access logger doesn't overwrite exist keys even if its value is null
+* Access log uses 'agent' column instead of 'ua' which is same as
+  '$ td import --format=apache'
+* Run IO threads lazily for Unicorn and Passenger
+
+
 == 2011-09-30 version 0.2.5
 
 * Use HTTP_X_FORWARDED_FOR instead of REMOTE_ADDR if it's available
