@@ -41,14 +41,11 @@ module Agent
       # ignore OPTIONS request
       if req.request_method != "OPTIONS"
         record = env['td.access_log'] || {}
-        access_time = env['td.access_time']
 
         # 'elapsed' column
-        if access_time
-          elapsed = Time.now - access_time
-
+        if access_time = env['td.access_time']
           unless record.has_key?(:elapsed)
-            record[:elapsed] = elapsed
+            record[:elapsed] = Time.now - access_time
           end
 
           # always overwrite 'time' column by access time
@@ -74,22 +71,23 @@ module Agent
         end
 
         # 'path' column
-        #   REQUEST_URI before '?'
+        #   requested path before '?'
         unless record.has_key?(:path)
           if path = env['REQUEST_URI']
-            path = path.to_s.sub(/\?.*$/,'')
-            record[:path] = path
+            if m = /(?:\w{1,10}\:\/\/[^\/]+)?([^\?]*)/.match(path)
+              record[:path] = m[1]
+            end
           end
         end
 
         # 'host' column
         #   Rack#host_with_port consideres HTTP_X_FORWARDED_HOST
         unless record.has_key?(:host)
-          record[:host] = request.host_with_port
+          record[:host] = req.host_with_port
         end
 
         # 'referer' column
-        unless record[:referer].has_key?(:referer)
+        unless record.has_key?(:referer)
           if referer = env['HTTP_REFERER']
             record[:referer] = referer.to_s
           end
@@ -108,12 +106,13 @@ module Agent
         end
 
         # 'controller' and 'action' columns
-        m = env[ACCESS_LOG_PARAM_ENV]
-        ACCESS_LOG_PRESET_PARAM_KEYS.each_pair {|key,val|
-          unless record.has_key?(key)
-            record[key] = m[val] if m[val]
-          end
-        }
+        if m = env[ACCESS_LOG_PARAM_ENV]
+          ACCESS_LOG_PRESET_PARAM_KEYS.each_pair {|key,val|
+            unless record.has_key?(key)
+              record[key] = m[val] if m[val]
+            end
+          }
+        end
 
         TreasureData.log(tag, record)
       end
