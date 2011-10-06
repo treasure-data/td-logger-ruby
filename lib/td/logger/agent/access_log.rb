@@ -46,10 +46,22 @@ module Agent
         # 'elapsed' column
         if access_time
           elapsed = Time.now - access_time
-          record[:elapsed] = elapsed
-          # set 'time' column to access time
+
+          unless record.has_key?(:elapsed)
+            record[:elapsed] = elapsed
+          end
+
+          # always overwrite 'time' column by access time
           record[:time] = access_time
         end
+
+        # merge params
+        req.params.each_pair {|key,val|
+          key = key.to_sym
+          unless record.has_key?(key)
+            record[key] = val
+          end
+        }
 
         # 'method' column
         if !record.has_key?(:method)
@@ -95,7 +107,7 @@ module Agent
           record[:status] = result[0].to_i
         end
 
-        # merge params
+        # 'controller' and 'action' columns
         m = env[ACCESS_LOG_PARAM_ENV]
         ACCESS_LOG_PRESET_PARAM_KEYS.each_pair {|key,val|
           unless record.has_key?(key)
