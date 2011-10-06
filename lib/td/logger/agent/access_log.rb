@@ -52,14 +52,18 @@ module Agent
         end
 
         # 'method' column
-        record[:method] ||= req.request_method
+        if !record.has_key?(:method)
+          record[:method] = req.request_method
+        end
 
         # 'ip' column
-        record[:ip] ||= (env['action_dispatch.remote_ip'] || req.ip).to_s
+        unless record.has_key?(:ip)
+          record[:ip] = (env['action_dispatch.remote_ip'] || req.ip).to_s
+        end
 
         # 'path' column
         #   REQUEST_URI before '?'
-        unless record[:path]
+        unless record.has_key?(:path)
           if path = env['REQUEST_URI']
             path = path.to_s.sub(/\?.*$/,'')
             record[:path] = path
@@ -68,22 +72,36 @@ module Agent
 
         # 'host' column
         #   Rack#host_with_port consideres HTTP_X_FORWARDED_HOST
-        record[:host] ||= request.host_with_port
+        unless record.has_key?(:host)
+          record[:host] = request.host_with_port
+        end
 
         # 'referer' column
-        record[:referer] ||= env['HTTP_REFERER'].to_s if env['HTTP_REFERER']
+        unless record[:referer].has_key?(:referer)
+          if referer = env['HTTP_REFERER']
+            record[:referer] = referer.to_s
+          end
+        end
 
         # 'agent' column
-        record[:agent] ||= env['HTTP_USER_AGENT'].to_s if env['HTTP_USER_AGENT']
+        unless record.has_key?(:agent)
+          if agent = env['HTTP_USER_AGENT']
+            record[:agent] = agent
+          end
+        end
+
+        # 'status' column
+        unless record.has_key?(:status)
+          record[:status] = result[0].to_i
+        end
 
         # merge params
         m = env[ACCESS_LOG_PARAM_ENV]
         ACCESS_LOG_PRESET_PARAM_KEYS.each_pair {|key,val|
-          record[key] ||= m[val] if m[val]
+          unless record.has_key?(key)
+            record[key] = m[val] if m[val]
+          end
         }
-
-        # result code
-        record[:status] ||= result[0].to_i
 
         TreasureData.log(tag, record)
       end
