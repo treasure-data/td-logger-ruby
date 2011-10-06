@@ -56,7 +56,10 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     @finish = false
     @next_time = Time.now.to_i + @flush_interval
     @error_count = 0
-    @upload_thread = Thread.new(&method(:upload_main))
+
+    # start thread when the first post() is called for
+    # Unicorn and Passenger.
+    @upload_thread = nil
   end
 
   attr_accessor :logger
@@ -68,7 +71,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
         @flush_now = true
         @cond.signal
       }
-      @upload_thread.join
+      @upload_thread.join if @upload_thread
 
       @map.each {|(db,table),buffer|
         upload(db, table, buffer)
@@ -94,6 +97,11 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
         @queue << [db, table, buffer]
         @map.delete(key)
         @cond.signal
+      end
+
+      # stat upload thread if it's not run
+      unless @upload_thread
+        @upload_thread = Thread.new(&method(:upload_main))
       end
     end
 
