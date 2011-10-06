@@ -68,13 +68,13 @@ module Agent
 
         # 'host' column
         #   Rack#host_with_port consideres HTTP_X_FORWARDED_HOST
-        record[:host] = request.host_with_port
+        record[:host] ||= request.host_with_port
 
         # 'referer' column
         record[:referer] ||= env['HTTP_REFERER'].to_s if env['HTTP_REFERER']
 
-        # 'ua' column
-        record[:ua] ||= env['HTTP_USER_AGENT'].to_s if env['HTTP_USER_AGENT']
+        # 'agent' column
+        record[:agent] ||= env['HTTP_USER_AGENT'].to_s if env['HTTP_USER_AGENT']
 
         # merge params
         m = env[ACCESS_LOG_PARAM_ENV]
