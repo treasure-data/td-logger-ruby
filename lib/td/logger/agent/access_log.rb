@@ -25,7 +25,11 @@ module Agent
   def self.enable_access_log(config)
     tag = config.access_log_table
 
-    filter_parameters = config.rails_config.filter_parameters
+    if config.rails_config.respond_to?(:filter_parameters)
+      filter_parameters = config.rails_config.filter_parameters
+    else
+      filter_parameters = []
+    end
 
     Middleware.before do |env|
       record = {}
