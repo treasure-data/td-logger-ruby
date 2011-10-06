@@ -25,6 +25,8 @@ module Agent
   def self.enable_access_log(config)
     tag = config.access_log_table
 
+    filter_parameters = config.rails_config.filter_parameters
+
     Middleware.before do |env|
       record = {}
       Thread.current['td.access_log'] = record
@@ -55,7 +57,7 @@ module Agent
         # merge params
         req.params.each_pair {|key,val|
           key = key.to_sym
-          unless record.has_key?(key)
+          unless record.has_key?(key) || filter_parameters.include?(key)
             record[key] = val
           end
         }

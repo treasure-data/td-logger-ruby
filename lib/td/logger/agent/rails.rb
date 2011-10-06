@@ -24,7 +24,9 @@ test:
 EOF
 
     class Config
-      def initialize(conf)
+      def initialize(conf, rails_config)
+        @rails_config = rails_config
+
         if agent = conf['agent']
           host, port = agent.split(':',2)
           port = (port || 24224).to_i
@@ -48,6 +50,7 @@ EOF
         @access_log_table = conf['access_log_table']
       end
 
+      attr_reader :rails_config
       attr_reader :agent_host, :agent_port, :tag
       attr_reader :apikey, :database, :auto_create_table
       attr_reader :access_log_table
@@ -79,7 +82,7 @@ EOF
           'database' => ENV['TREASURE_DATA_DB'] || "rails_#{::Rails.env}",
           'access_log_table' => ENV['TREASURE_DATA_TABLE'] || 'web_access',
           'auto_create_table' => true
-        })
+        }, rails)
       end
 
       begin
@@ -102,7 +105,7 @@ EOF
       end
 
       begin
-        return Config.new(conf)
+        return Config.new(conf, rails)
       rescue
         logger.warn "#{CONFIG_PATH}: #{$!}."
         logger.warn "Disabling Treasure Data logger."
