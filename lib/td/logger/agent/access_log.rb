@@ -41,7 +41,7 @@ module Agent
         record = env['td.access_log'] || {}
         access_time = env['td.access_time']
 
-        # add 'elapsed' column
+        # 'elapsed' column
         if access_time
           elapsed = Time.now - access_time
           record[:elapsed] = elapsed
@@ -49,12 +49,32 @@ module Agent
           record[:time] = access_time
         end
 
+        # 'method' column
         record[:method] ||= req.request_method
+
+        # 'ip' column
         record[:ip] ||= (env['action_dispatch.remote_ip'] || req.ip).to_s
-        record[:uri] ||= env['REQUEST_URI'].to_s if env['REQUEST_URI']
+
+        # 'path' column
+        #   REQUEST_URI before '?'
+        unless record[:path]
+          if path = env['REQUEST_URI']
+            path = path.to_s.sub(/\?.*$/,'')
+            record[:path] = path
+          end
+        end
+
+        # 'host' column
+        #   Rack#host_with_port consideres HTTP_X_FORWARDED_HOST
+        record[:host] = request.host_with_port
+
+        # 'referer' column
         record[:referer] ||= env['HTTP_REFERER'].to_s if env['HTTP_REFERER']
+
+        # 'ua' column
         record[:ua] ||= env['HTTP_USER_AGENT'].to_s if env['HTTP_USER_AGENT']
 
+        # merge params
         m = env[ACCESS_LOG_PARAM_ENV]
         ACCESS_LOG_PRESET_PARAM_KEYS.each_pair {|key,val|
           record[key] ||= m[val] if m[val]
