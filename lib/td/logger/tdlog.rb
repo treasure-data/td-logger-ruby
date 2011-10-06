@@ -80,10 +80,10 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
   end
 
   def post(tag, record)
+    record[:time] ||= Time.now.to_i
+
     tag = "#{@tag}.#{tag}"
     db, table = tag.split('.')[-2, 2]
-
-    record['time'] ||= Time.now.to_i
 
     key = [db, table]
     @mutex.synchronize do

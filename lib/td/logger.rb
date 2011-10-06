@@ -12,7 +12,6 @@ def self.open_agent(tag, agent_host, agent_port)
 end
 
 def self.log(tag, record)
-  record['time'] ||= Time.now.to_i
   Fluent::Logger.post(tag, record)
 end
 

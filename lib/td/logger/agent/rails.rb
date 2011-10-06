@@ -128,7 +128,7 @@ EOF
       rails.middleware.use Agent::Middleware
 
       if c.access_log_enabled?
-        Agent.enable_access_log(c.access_log_table)
+        Agent.enable_access_log(c)
       end
       Agent::Rails.init_controller
       Agent::Rails.init_model

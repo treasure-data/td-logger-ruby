@@ -22,7 +22,9 @@ module Agent
     :action => :action,
   }
 
-  def self.enable_access_log(tag)
+  def self.enable_access_log(config)
+    tag = config.access_log_table
+
     Middleware.before do |env|
       record = {}
       Thread.current['td.access_log'] = record
