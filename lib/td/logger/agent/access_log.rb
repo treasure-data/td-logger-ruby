@@ -61,7 +61,9 @@ module Agent
         # merge params
         req.params.each_pair {|key,val|
           key = key.to_sym
-          unless record.has_key?(key) || filter_parameters.include?(key)
+          if !record.has_key?(key) &&
+              !filter_parameters.include?(key) &&
+              val.respond_to?(:to_msgpack)
             record[key] = val
           end
         }
