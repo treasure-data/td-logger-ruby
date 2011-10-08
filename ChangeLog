@@ -1,4 +1,9 @@
 
+== 2011-10-09 version 0.2.7
+
+* Access logger checks respond_to?(:to_msgpack) for each values of params
+
+
 == 2011-10-06 version 0.2.6
 
 * Divided 'uri' column into 'path' and 'host' columns in access logs
