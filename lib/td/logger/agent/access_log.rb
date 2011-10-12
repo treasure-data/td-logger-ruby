@@ -22,6 +22,12 @@ module Agent
     :action => :action,
   }
 
+  class MessagePackedString < String
+    def to_msgpack(out = '')
+      out << self
+    end
+  end
+
   def self.enable_access_log(config)
     tag = config.access_log_table
 
@@ -61,10 +67,12 @@ module Agent
         # merge params
         req.params.each_pair {|key,val|
           key = key.to_sym
-          if !record.has_key?(key) &&
-              !filter_parameters.include?(key) &&
-              val.respond_to?(:to_msgpack)
-            record[key] = val
+          if !record.has_key?(key) && !filter_parameters.include?(key)
+            begin
+              record[key] = val.to_msgpack(MessagePackedString.new)
+            rescue
+              # ignore
+            end
           end
         }
 
