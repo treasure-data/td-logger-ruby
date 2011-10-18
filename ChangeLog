@@ -1,4 +1,9 @@
 
+== 2011-10-17 version 0.2.8
+
+* Access logger checks to_msgpack for each values and nested values
+
+
 == 2011-10-09 version 0.2.7
 
 * Access logger checks respond_to?(:to_msgpack) for each values of params
