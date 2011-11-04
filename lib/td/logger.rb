@@ -4,16 +4,22 @@ module TreasureData
 module Logger
   autoload :TreasureDataLogger, 'td/logger/td_logger'
 
+  @@logger = nil
+
   def self.open(database, options={})
-    TreasureData::Logger::TreasureDataLogger.open(database, options)
+    @@logger = TreasureData::Logger::TreasureDataLogger.new(database, options)
   end
 
   def self.open_agent(tag, options={})
-    Fluent::Logger::FluentLogger.open(tag, options)
+    @@logger = Fluent::Logger::FluentLogger.new(tag, options)
+  end
+
+  def self.open_null
+    @@logger = Fluent::Logger::NullLogger.new
   end
 
   def self.post(tag, record, time=nil)
-    Fluent::Logger.post(tag, record, time)
+    @@logger.post(tag, record, time)
   end
 end
 end
@@ -27,6 +33,10 @@ module TreasureData
 
   def self.open_agent(tag, options={})
     TreasureData::Logger.open_agent(tag, options)
+  end
+
+  def self.open_null
+    TreasureData::Logger.open_null
   end
 
   def self.post(tag, record, time=nil)

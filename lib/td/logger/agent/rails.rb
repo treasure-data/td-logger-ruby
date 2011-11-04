@@ -11,12 +11,15 @@ module Agent::Rails
 
   def self.init(rails)
     c = Config.init
-    return unless c
+    unless c
+      ::TreasureData::Logger.open_null
+      return false
+    end
 
     if c.agent_mode?
-      ::TreasureData.open_agent(c.tag, :host=>c.agent_host, :port=>c.agent_port)
+      ::TreasureData::Logger.open_agent(c.tag, :host=>c.agent_host, :port=>c.agent_port)
     else
-      ::TreasureData.open(c.database, :apikey=>c.apikey, :auto_create_table=>c.auto_create_table)
+      ::TreasureData::Logger.open(c.database, :apikey=>c.apikey, :auto_create_table=>c.auto_create_table)
     end
 
     rails.middleware.use Agent::Rack::Hook
@@ -28,6 +31,8 @@ module Agent::Rails
     Agent::Rails::ControllerExtension.init
     #Agent::Rails::AccessLogger.init(c.access_log_table) if c.access_log_enabled?
     #Agent::Rails::ModelExtension.init
+
+    true
   end
 
   if ::Rails.respond_to?(:version) && ::Rails.version =~ /^3/

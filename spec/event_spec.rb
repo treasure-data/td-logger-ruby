@@ -7,7 +7,8 @@ describe TreasureData::Logger::Event do
       Fluent::Logger::TestLogger.new
     end
     before(:each) do
-      Fluent::Logger.default = test_logger
+      t = test_logger
+      TreasureData::Logger.class_variable_set(:@@logger, t)
       TD.event.attribute.clear
     end
 
