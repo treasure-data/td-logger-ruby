@@ -1,31 +1,54 @@
 require 'fluent/logger'
 
 module TreasureData
+module Logger
+  autoload :TreasureDataLogger, 'td/logger/td_logger'
 
-def self.open(apikey, database, auto_create_table=false)
-  require 'td/logger/tdlog'
-  TreasureData::Logger::TreasureDataLogger.open(apikey, database, auto_create_table)
-end
+  def self.open(apikey, database, auto_create_table=false)
+    TreasureData::Logger::TreasureDataLogger.open(apikey, database, auto_create_table)
+  end
 
-def self.open_agent(tag, agent_host, agent_port)
-  Fluent::Logger::FluentLogger.open(tag, agent_host, agent_port)
-end
+  def self.open_agent(tag, agent_host, agent_port)
+    Fluent::Logger::FluentLogger.open(tag, agent_host, agent_port)
+  end
 
-def self.log(tag, record)
-  Fluent::Logger.post(tag, record)
-end
-
-end
-
-
-class Time
-  def to_msgpack(out = '')
-    to_i.to_msgpack(out)
+  def self.post(tag, record, time=Time.now)
+    Fluent::Logger.post(tag, record, time)
   end
 end
+end
 
 
-if defined? Rails
+# shortcut methods
+module TreasureData
+  def self.open(apikey, database, auto_create_table=false)
+    TreasureData::Logger.open(apikey, database, auto_create_table=false)
+  end
+
+  def self.open_agent(tag, agent_host, agent_port)
+    TreasureData::Logger.open_agent(tag, agent_host, agent_port)
+  end
+
+  def self.post(tag, record, time=Time.now)
+    TreasureData::Logger.post(tag, record, time)
+  end
+
+  def self.event
+    TreasureData::Logger.event
+  end
+
+  # backward compatibility
+  def self.log(*args)  # :nodoc:
+    TreasureData::Logger.post(*args)
+  end
+
+  Event = TreasureData::Logger::Event
+end
+
+# shortcut constants
+TD = TreasureData
+
+if defined? ::Rails
   require 'td/logger/agent/rails'
 end
 

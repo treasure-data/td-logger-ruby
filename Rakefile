@@ -14,7 +14,7 @@ begin
     gemspec.require_paths = ["lib"]
     gemspec.add_dependency "msgpack", "~> 0.4.4"
     gemspec.add_dependency "td-client", "~> 0.8.0"
-    gemspec.add_dependency "fluent-logger", "~> 0.3.0"
+    gemspec.add_dependency "fluent-logger", "~> 0.4.0"
     gemspec.test_files = Dir["test/**/*.rt"]
     gemspec.files = Dir["lib/**/*", "ext/**/*", "test/**/*.rb", "test/**/*.rt"]
     gemspec.executables = []

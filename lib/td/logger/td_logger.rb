@@ -82,8 +82,8 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     end
   end
 
-  def post(tag, record)
-    record[:time] ||= Time.now.to_i
+  def post(tag, record, time=Time.now)
+    record[:time] ||= time.to_i
 
     tag = "#{@tag}.#{tag}"
     db, table = tag.split('.')[-2, 2]
@@ -212,7 +212,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
   end
 
   if ConditionVariable.new.method(:wait).arity == 1
-    #$log.warn "WARNING: Running on Ruby 1.8. Ruby 1.9 is recommended."
+    # "WARNING: Running on Ruby 1.8. Ruby 1.9 is recommended."
     require 'timeout'
     def cond_wait(sec)
       Timeout.timeout(sec) {

@@ -1,35 +1,33 @@
 module TreasureData
 module Logger
-module Agent
-  module Rails
+module Agent::Rails
+  module ControllerExtension
 
-    def self.init_controller
-      ActionController::Base.send(:include, ControllerExtension)
+    def self.init
+      ::ActionController::Base.send(:include, self)
     end
 
-    module ControllerExtension
-      if defined?(ActiveSupport::Concern)
-        # Rails 2
-        extend ActiveSupport::Concern
-      else
-        def self.included(mod)
-          im = InstanceMethods
-          cm = ClassMethods
-          mod.class_eval do
-            include im
-            extend cm
-          end
+    if defined?(ActiveSupport::Concern)
+      extend ActiveSupport::Concern
+    else
+      # Rails 2
+      def self.included(mod)
+        im = InstanceMethods
+        cm = ClassMethods
+        mod.class_eval do
+          include im
+          extend cm
         end
       end
+    end
 
-      module InstanceMethods
-        def td_access_log
-          request.env['td.access_log'] ||= {}
-        end
+    module InstanceMethods
+      def event
+        TreasureData::Logger.event
       end
+    end
 
-      module ClassMethods
-      end
+    module ClassMethods
     end
 
   end
