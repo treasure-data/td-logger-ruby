@@ -1,4 +1,13 @@
 
+== 2011-11-05 version 0.3.0
+
+* Added new API: TD.event
+* Added event presets: TD.event.register, login, pay
+* Added feature to add set attributes to all events: TD.event.attribute
+* Stop to log access logs
+* Use NullLogger when logger is disabled
+
+
 == 2011-10-17 version 0.2.8
 
 * Access logger checks to_msgpack for each values and nested values
