@@ -4,12 +4,12 @@ module TreasureData
 module Logger
   autoload :TreasureDataLogger, 'td/logger/td_logger'
 
-  def self.open(apikey, database, auto_create_table=false)
-    TreasureData::Logger::TreasureDataLogger.open(apikey, database, auto_create_table)
+  def self.open(database, options={})
+    TreasureData::Logger::TreasureDataLogger.open(database, options)
   end
 
-  def self.open_agent(tag, agent_host, agent_port)
-    Fluent::Logger::FluentLogger.open(tag, agent_host, agent_port)
+  def self.open_agent(tag, options={})
+    Fluent::Logger::FluentLogger.open(tag, options)
   end
 
   def self.post(tag, record, time=nil)
@@ -21,12 +21,12 @@ end
 
 # shortcut methods
 module TreasureData
-  def self.open(apikey, database, auto_create_table=false)
-    TreasureData::Logger.open(apikey, database, auto_create_table=false)
+  def self.open(database, options={})
+    TreasureData::Logger.open(database, options)
   end
 
-  def self.open_agent(tag, agent_host, agent_port)
-    TreasureData::Logger.open_agent(tag, agent_host, agent_port)
+  def self.open_agent(tag, options={})
+    TreasureData::Logger.open_agent(tag, options)
   end
 
   def self.post(tag, record, time=nil)
@@ -49,7 +49,18 @@ end
 # shortcut constants
 TD = TreasureData
 
-if defined? ::Rails
-  require 'td/logger/agent/rails'
+# implement Time#to_msgpack
+unless Time.now.respond_to?(:to_msgpack)
+  class Time
+    def to_msgpack(out='')
+      strftime("%Y-%m-%d %H:%M:%S %z").to_msgpack(out)
+    end
+  end
+end
+
+module TreasureData::Logger::Agent
+  if defined? ::Rails
+    require 'td/logger/agent/rails'
+  end
 end
 

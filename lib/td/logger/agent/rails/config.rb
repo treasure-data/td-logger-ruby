@@ -21,7 +21,11 @@ module Agent::Rails
         @database = conf['database']
         raise "'database' option is not set" unless @database
 
-        @auto_create_table = !!conf['auto_create_table']
+        if conf.has_key?('auto_create_table')
+          @auto_create_table = !!conf['auto_create_table']
+        else
+          @auto_create_table = true
+        end
       end
 
       @access_log_table = conf['access_log_table']
@@ -39,16 +43,16 @@ module Agent::Rails
       !@access_log_table.nil? && !@access_log_table.empty?
     end
 
-    def self.init(rails)
+    def self.init
       logger = ::Rails.logger || ::Logger.new(STDERR)
-      if File.exist?(CONFIG_PATH)
-        load_file(rails, logger)
+      if File.exist?("#{::Rails.root}/#{CONFIG_PATH}")
+        load_file(logger)
       else
-        load_env(rails, logger)
+        load_env(logger)
       end
     end
 
-    def self.load_file(rails, logger)
+    def self.load_file(logger)
       require 'yaml'
       require 'erb'
 
@@ -78,7 +82,7 @@ module Agent::Rails
       end
     end
 
-    def self.load_env(rails, logger)
+    def self.load_env(logger)
       apikey = ENV['TREASURE_DATA_API_KEY'] || ENV['TD_API_KEY']
 
       unless apikey
@@ -90,7 +94,7 @@ module Agent::Rails
       return Config.new({
         'apikey' => apikey,
         'database' => ENV['TREASURE_DATA_DB'] || "rails_#{::Rails.env}",
-        'access_log_table' => ENV['TREASURE_DATA_ACCESS_LOG_TABLE']
+        'access_log_table' => ENV['TREASURE_DATA_ACCESS_LOG_TABLE'],
         'auto_create_table' => true
       })
     end

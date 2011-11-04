@@ -1,4 +1,3 @@
-
 module TreasureData
 module Logger
 
@@ -23,19 +22,30 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
   end
   extend Finalizable
 
-  def initialize(apikey, tag, auto_create_table)
+  def initialize(tag_prefix, options={})
+    defaults = {
+      :auto_create_table => false,
+    }
+    options = defaults.merge!(options)
+
+    @tag_prefix = tag_prefix
+    @auto_create_table = !!options[:auto_create_table]
+
+    apikey = options[:apikey]
+    unless apikey
+      raise ArgumentError, ":apikey options is required"
+    end
+
     require 'thread'
     require 'stringio'
     require 'zlib'
     require 'msgpack'
+    require 'json'
     require 'time'
     require 'net/http'
     require 'cgi'
     require 'logger'
     require 'td/client'
-
-    @tag = tag
-    @auto_create_table = auto_create_table
 
     @logger = ::Logger.new(STDERR)
     @logger.level = ::Logger::INFO
@@ -82,30 +92,14 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     end
   end
 
-  def post(tag, record, time=Time.now)
+  def post(tag, record, time=nil)
+    time ||= Time.now
     record[:time] ||= time.to_i
 
-    tag = "#{@tag}.#{tag}"
+    tag = "#{@tag_prefix}.#{tag}" if @tag_prefix
     db, table = tag.split('.')[-2, 2]
 
-    key = [db, table]
-    @mutex.synchronize do
-      buffer = (@map[key] ||= '')
-      record.to_msgpack(buffer)
-
-      if buffer.size > @chunk_limit
-        @queue << [db, table, buffer]
-        @map.delete(key)
-        @cond.signal
-      end
-
-      # stat upload thread if it's not run
-      unless @upload_thread
-        @upload_thread = Thread.new(&method(:upload_main))
-      end
-    end
-
-    nil
+    add(db, table, record)
   end
 
   def upload_main
@@ -146,6 +140,44 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
   end
 
   private
+  def add(db, table, msg)
+    begin
+      data = msg.to_msgpack
+    rescue
+      @logger.error("TreasureDataLogger: Can't convert to msgpack: #{msg.inspect}: #{$!}")
+      return false
+    end
+
+    key = [db, table]
+
+    @mutex.synchronize do
+      buffer = (@map[key] ||= '')
+
+      buffer << data
+
+      if buffer.size > @chunk_limit
+        @queue << [db, table, buffer]
+        @map.delete(key)
+        @cond.signal
+      end
+
+      # stat upload thread if it's not run
+      unless @upload_thread
+        @upload_thread = Thread.new(&method(:upload_main))
+      end
+    end
+
+    true
+  end
+
+  def to_msgpack(msg)
+    begin
+      msg.to_msgpack
+    rescue NoMethodError
+      JSON.load(JSON.dump(msg)).to_msgpack
+    end
+  end
+
   def try_flush
     @mutex.synchronize do
       if @queue.empty?

@@ -2,10 +2,10 @@
 require 'spec_helper'
 
 describe TreasureData::Logger::Event do
-  context "preset" do
-    let(:test_logger) {
+  context 'preset' do
+    let(:test_logger) do
       Fluent::Logger::TestLogger.new
-    }
+    end
     before(:each) do
       Fluent::Logger.default = test_logger
       TD.event.attribute.clear
