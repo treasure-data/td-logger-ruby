@@ -19,7 +19,7 @@ module Logger
   end
 
   def self.post(tag, record={}, time=nil)
-    @@logger.post(tag, record={}, time)
+    @@logger.post(tag, record, time)
   end
 end
 end
