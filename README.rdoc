@@ -29,33 +29,36 @@ And then add +config/treasure_data.yml+ file as following:
     # disable logging
     test:
 
-=== Logging access logs
+== Logging events
 
-Following information will be logged automatically:
+You can log anytime using 'TD.event.post' method:
 
-* controller name ('controller' column)
-* action name ('action' column)
-* remote host ip address ('remote_addr' column)
-* http status code ('status' column)
-* http referer ('refer' column)
-
-To add information to the log, call 'td_access_log' method in a Controller:
-
-    class YourController < ApplicationController
-      def myaction
-        td_access_log[:column] = "value"
-      end
-    end
-
-Or call 'TreasureData.access_log' method outside of a Controller:
-
-    class MyHelperModule
+    class MyClass
       def mymethod
-        TreasureData.access_log[:column] = "value"
+        TD.event.post('table_name', {:foo=>:bar})
       end
     end
 
+== Rails extension
 
+In rails application, you can use 'TD.event.attribute' to set static attribute to all events:
+
+    class ApplicationController
+      def authenticate
+        # set 'uid' attribute to succeeding event logs
+        TD.event.attribute[:uid] = 198
+      end
+    end
+
+    class MyController < ApplicationController
+      def mymethod
+        authenticate()
+        # this event includes 'uid' attribute
+        TD.event.post('table_name', {:foo=>:bar})
+      end
+    end
+
+--
 === Logging model changes
 
 Add 'td_enable_model_tracer' line to your Model class:
@@ -92,6 +95,7 @@ You can log anytime using 'TreasureData.log' method:
         TreasureData.log('mytable', {:col1=>"val1", :col2=>"val2"}
       end
     end
+++
 
 
 == Copyright
