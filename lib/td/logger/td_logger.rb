@@ -199,10 +199,10 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
         flushed = true
       rescue
         if @error_count < @retry_limit
-          @logger.error "Failed to import logs to Treasure Data, retrying: #{$!}"
+          @logger.error "Failed to upload event logs to Treasure Data, retrying: #{$!}"
           @error_count += 1
         else
-          @logger.error "Failed to import logs to Treasure Data, trashed: #{$!}"
+          @logger.error "Failed to upload event logs to Treasure Data, trashed: #{$!}"
           $!.backtrace.each {|bt|
             @logger.info bt
           }
@@ -217,7 +217,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
   end
 
   def upload(db, table, buffer)
-    @logger.debug "Importing logs to #{db}.#{table} table on TreasureData"
+    @logger.debug "Uploading event logs to #{db}.#{table} table on Treasure Data"
     begin
       out = StringIO.new
       Zlib::GzipWriter.wrap(out) {|gz| gz.write buffer }
@@ -228,7 +228,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
       unless @auto_create_table
         raise $!
       end
-      @logger.info "Creating table #{db}.#{table} on TreasureData"
+      @logger.info "Creating table #{db}.#{table} on Treasure Data"
       begin
         @client.create_log_table(db, table)
       rescue TreasureData::NotFoundError

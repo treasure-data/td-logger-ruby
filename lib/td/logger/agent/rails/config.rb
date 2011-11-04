@@ -62,14 +62,14 @@ module Agent::Rails
         env_conf = YAML.load(yaml)
       rescue
         logger.warn "Can't load #{CONFIG_PATH} file: #{$!}"
-        logger.warn "Disabling Treasure Data logger."
+        logger.warn "Disabling Treasure Data event logger."
         return nil
       end
 
       conf = env_conf[::Rails.env]
       unless conf
         logger.warn "#{CONFIG_PATH} doesn't include setting for current environment (#{::Rails.env})."
-        logger.warn "Disabling Treasure Data logger."
+        logger.warn "Disabling Treasure Data event logger."
         return nil
       end
 
@@ -77,7 +77,7 @@ module Agent::Rails
         return Config.new(conf)
       rescue
         logger.warn "#{CONFIG_PATH}: #{$!}."
-        logger.warn "Disabling Treasure Data logger."
+        logger.warn "Disabling Treasure Data event logger."
         return nil
       end
     end
@@ -87,7 +87,7 @@ module Agent::Rails
 
       unless apikey
         logger.warn "#{CONFIG_PATH} does not exist."
-        logger.warn "Disabling Treasure Data logger."
+        logger.warn "Disabling Treasure Data event logger."
         return nil
       end
 

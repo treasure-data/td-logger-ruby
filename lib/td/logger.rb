@@ -27,6 +27,8 @@ end
 
 # shortcut methods
 module TreasureData
+  require 'td/logger/event'
+
   def self.open(database, options={})
     TreasureData::Logger.open(database, options)
   end
@@ -47,13 +49,12 @@ module TreasureData
     TreasureData::Logger.event
   end
 
+  Event = TreasureData::Logger::Event
+
   # backward compatibility
   def self.log(*args)  # :nodoc:
     TreasureData::Logger.post(*args)
   end
-
-  require 'td/logger/event'
-  Event = TreasureData::Logger::Event
 end
 
 # shortcut constants
