@@ -26,6 +26,8 @@ module Agent::Rails
         else
           @auto_create_table = true
         end
+
+        @debug_mode = !!conf['debug_mode']
       end
 
       @access_log_table = conf['access_log_table']
@@ -33,7 +35,7 @@ module Agent::Rails
 
     attr_reader :agent_host, :agent_port, :tag
     attr_reader :apikey, :database, :auto_create_table
-    attr_reader :access_log_table
+    attr_reader :access_log_table, :debug_mode
 
     def agent_mode?
       @agent_host != nil

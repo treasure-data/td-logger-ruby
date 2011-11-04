@@ -19,7 +19,7 @@ module Agent::Rails
     if c.agent_mode?
       ::TreasureData::Logger.open_agent(c.tag, :host=>c.agent_host, :port=>c.agent_port)
     else
-      ::TreasureData::Logger.open(c.database, :apikey=>c.apikey, :auto_create_table=>c.auto_create_table)
+      ::TreasureData::Logger.open(c.database, :apikey=>c.apikey, :auto_create_table=>c.auto_create_table, :debug=>c.debug_mode)
     end
 
     rails.middleware.use Agent::Rack::Hook

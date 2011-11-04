@@ -64,6 +64,7 @@ describe TreasureData::Logger::Agent::Rails::Config do
 test:
   apikey: test2
   database: db2
+  debug_mode: true
 EOF
       }
       c = TreasureData::Logger::Agent::Rails::Config.init
@@ -71,6 +72,7 @@ EOF
       c.apikey.should == 'test2'
       c.database.should == 'db2'
       c.auto_create_table.should == true
+      c.debug_mode.should == true
     end
 
     it 'prefer file than env' do
@@ -91,6 +93,7 @@ EOF
       c.apikey.should == 'test4'
       c.database.should == 'db4'
       c.auto_create_table.should == false
+      c.debug_mode.should == false
     end
 
     it 'agent mode' do

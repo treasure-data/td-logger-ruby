@@ -36,6 +36,8 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
       raise ArgumentError, ":apikey options is required"
     end
 
+    debug = !!options[:debug]
+
     require 'thread'
     require 'stringio'
     require 'zlib'
@@ -48,7 +50,11 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     require 'td/client'
 
     @logger = ::Logger.new(STDERR)
-    @logger.level = ::Logger::INFO
+    if debug
+      @logger.level = ::Logger::DEBUG
+    else
+      @logger.level = ::Logger::INFO
+    end
 
     @client = TreasureData::Client.new(apikey)
 
@@ -93,6 +99,8 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
   end
 
   def post(tag, record, time=nil)
+    @logger.debug { "event: #{tag} #{record.to_json}" rescue nil }
+
     time ||= Time.now
     record[:time] ||= time.to_i
 
