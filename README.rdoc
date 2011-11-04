@@ -58,45 +58,6 @@ In rails application, you can use 'TD.event.attribute' to set static attribute t
       end
     end
 
---
-=== Logging model changes
-
-Add 'td_enable_model_tracer' line to your Model class:
-
-    class MyModel < ActiveRecord::Base
-      td_enable_model_tracer :mytable
-    end
-
-It logs all columns when the model is changed. Use :only option to limit columns to log:
-
-    class MyModel < ActiveRecord::Base
-      td_enable_model_tracer :mytable, :only => [:id, :mycol]
-    end
-
-Alternatively, use :except option to except columns to log:
-
-    class MyModel < ActiveRecord::Base
-      td_enable_model_tracer :mytable, :except => [:created_at]
-    end
-
-Add 'static' option to add constant key-value pairs:
-
-    class MyModel < ActiveRecord::Base
-      td_enable_model_tracer :mytable, :except => [:created_at], :static => {'model'=>'my'}
-    end
-
-
-=== Logging other logs
-
-You can log anytime using 'TreasureData.log' method:
-
-    class MyClass
-      def mymethod
-        TreasureData.log('mytable', {:col1=>"val1", :col2=>"val2"}
-      end
-    end
-++
-
 
 == Copyright
 
