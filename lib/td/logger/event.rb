@@ -8,23 +8,32 @@ module Logger
   end
 
   module EventPreset
-    def action(name, record, uid=TD.attribute[:uid])
+    def action(name, record, uid=TD.event.attribute[:uid])
       unless uid
         raise ArgumentError, "wrong number of arguments (2 for 3): uid is required"
       end
-      post(:login, record.merge({:uid=>uid}))
+      post(name, record.merge({:uid=>uid}))
     end
 
-    def register(uid=TD.attribute[:uid])
+    def register(uid=TD.event.attribute[:uid])
+      unless uid
+        raise ArgumentError, "wrong number of arguments (0 for 1): uid is required"
+      end
       action(:register, {}, uid)
     end
 
-    def login(uid=TD.attribute[:uid])
-      action(:register, {}, uid)
+    def login(uid=TD.event.attribute[:uid])
+      unless uid
+        raise ArgumentError, "wrong number of arguments (0 for 1): uid is required"
+      end
+      action(:login, {}, uid)
     end
 
-    def pay(category, sub_category, item, uid=TD.attribute[:uid])
-      action(:pay, {:category=>category, :sub_category=>sub_category, :item=>item}, uid)
+    def pay(category, sub_category, name, price, count, uid=TD.event.attribute[:uid])
+      unless uid
+        raise ArgumentError, "wrong number of arguments (3 for 4): uid is required"
+      end
+      action(:pay, {:category=>category, :sub_category=>sub_category, :name=>name, :price=>price, :count=>count}, uid)
     end
   end
 
@@ -37,7 +46,7 @@ module Logger
 
     attr_accessor :attribute
 
-    def post(action, record, time=Time.now)
+    def post(action, record, time=nil)
       TreasureData::Logger.post(action, @attribute.merge(record), time)
     end
 

@@ -12,7 +12,7 @@ module Logger
     Fluent::Logger::FluentLogger.open(tag, agent_host, agent_port)
   end
 
-  def self.post(tag, record, time=Time.now)
+  def self.post(tag, record, time=nil)
     Fluent::Logger.post(tag, record, time)
   end
 end
@@ -29,7 +29,7 @@ module TreasureData
     TreasureData::Logger.open_agent(tag, agent_host, agent_port)
   end
 
-  def self.post(tag, record, time=Time.now)
+  def self.post(tag, record, time=nil)
     TreasureData::Logger.post(tag, record, time)
   end
 
@@ -42,6 +42,7 @@ module TreasureData
     TreasureData::Logger.post(*args)
   end
 
+  require 'td/logger/event'
   Event = TreasureData::Logger::Event
 end
 
