@@ -17,14 +17,11 @@ And then add +config/treasure_data.yml+ file as following:
     development:
       apikey: "YOUR_API_KEY"
       database: myapp
-      access_log_table: access
-      auto_create_table: true
     
     # logging via td-agent (fluent)
     production:
       agent: "localhost:24224"
       tag: td.myapp
-      access_log_table: access
     
     # disable logging
     test:

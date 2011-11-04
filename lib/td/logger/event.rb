@@ -46,7 +46,7 @@ module Logger
 
     attr_accessor :attribute
 
-    def post(action, record, time=nil)
+    def post(action, record={}, time=nil)
       TreasureData::Logger.post(action, @attribute.merge(record), time)
     end
 

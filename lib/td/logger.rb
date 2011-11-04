@@ -18,8 +18,8 @@ module Logger
     @@logger = Fluent::Logger::NullLogger.new
   end
 
-  def self.post(tag, record, time=nil)
-    @@logger.post(tag, record, time)
+  def self.post(tag, record={}, time=nil)
+    @@logger.post(tag, record={}, time)
   end
 end
 end
@@ -41,7 +41,7 @@ module TreasureData
     TreasureData::Logger.open_null
   end
 
-  def self.post(tag, record, time=nil)
+  def self.post(tag, record={}, time=nil)
     TreasureData::Logger.post(tag, record, time)
   end
 
