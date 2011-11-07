@@ -224,11 +224,12 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
   end
 
   def upload(db, table, buffer)
-    @logger.debug "Uploading event logs to #{db}.#{table} table on Treasure Data"
     begin
       out = StringIO.new
       Zlib::GzipWriter.wrap(out) {|gz| gz.write buffer }
       stream = StringIO.new(out.string)
+
+      @logger.debug "Uploading event logs to #{db}.#{table} table on Treasure Data (#{stream.size} bytes)"
 
       @client.import(db, table, "msgpack.gz", stream, stream.size)
     rescue TreasureData::NotFoundError
