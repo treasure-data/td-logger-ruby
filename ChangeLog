@@ -1,4 +1,10 @@
 
+== 2011-11-07 version 0.3.1
+
+* Added "debug_mode: true" option in config/treasure_data.yml
+* Updated fluent-logger to v0.4.1
+
+
 == 2011-11-05 version 0.3.0
 
 * Added new API: TD.event

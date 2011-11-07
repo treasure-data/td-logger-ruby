@@ -17,6 +17,7 @@ And then add +config/treasure_data.yml+ file as following:
     development:
       apikey: "YOUR_API_KEY"
       database: myapp
+      debug_mode: true  # enable debug mode
     
     # logging via td-agent (fluent)
     production:
