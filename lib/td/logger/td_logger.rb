@@ -98,10 +98,9 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     end
   end
 
-  def post(tag, record, time=nil)
+  def post_with_time(tag, record, time)
     @logger.debug { "event: #{tag} #{record.to_json}" rescue nil }
 
-    time ||= Time.now
     record[:time] ||= time.to_i
 
     tag = "#{@tag_prefix}.#{tag}" if @tag_prefix
@@ -148,9 +147,17 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
   end
 
   private
+  def to_msgpack(msg)
+    begin
+      msg.to_msgpack
+    rescue NoMethodError
+      JSON.load(JSON.dump(msg)).to_msgpack
+    end
+  end
+
   def add(db, table, msg)
     begin
-      data = msg.to_msgpack
+      data = to_msgpack(msg)
     rescue
       @logger.error("TreasureDataLogger: Can't convert to msgpack: #{msg.inspect}: #{$!}")
       return false
@@ -176,14 +183,6 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     end
 
     true
-  end
-
-  def to_msgpack(msg)
-    begin
-      msg.to_msgpack
-    rescue NoMethodError
-      JSON.load(JSON.dump(msg)).to_msgpack
-    end
   end
 
   def try_flush

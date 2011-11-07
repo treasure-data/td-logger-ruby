@@ -86,7 +86,7 @@ module Agent::Rails
           else
             time = Time.now
           end
-          TreasureData::Logger.post(tag, data, time)
+          TreasureData::Logger.post_with_time(tag, data, time)
         end
       end
     end
