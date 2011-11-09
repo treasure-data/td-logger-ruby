@@ -12,7 +12,7 @@ module Logger
       unless uid
         raise ArgumentError, "wrong number of arguments (2 for 3): :uid attribute is required"
       end
-      post(name, record.merge({:uid=>uid}))
+      post(name, record.merge({:action=>name, :uid=>uid}))
     end
 
     def register(uid=TD.event.attribute[:uid])
