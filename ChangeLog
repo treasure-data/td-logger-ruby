@@ -1,4 +1,9 @@
 
+== 2011-11-10 version 0.3.3
+
+* Validate database name and table name before queuing events
+
+
 == 2011-11-10 version 0.3.2
 
 * Include 'action' column for all preset events
