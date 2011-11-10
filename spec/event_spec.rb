@@ -8,7 +8,9 @@ describe TreasureData::Logger::Event do
     end
     before(:each) do
       t = test_logger
-      TreasureData::Logger.class_variable_set(:@@logger, t)
+      TreasureData::Logger.module_eval do
+        class_variable_set(:@@logger, t)
+      end
       TD.event.attribute.clear
     end
 

@@ -49,7 +49,7 @@ module TreasureData
     TreasureData::Logger.post(tag, record)
   end
 
-  def self.post_with_time(tag, record={}, time)
+  def self.post_with_time(tag, record, time)
     TreasureData::Logger.post_with_time(tag, record, time)
   end
 
