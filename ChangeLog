@@ -1,4 +1,11 @@
 
+== 2011-11-11 version 0.3.7
+
+* Use bundler for packaging
+* Fixed Config.load_file
+* Fixed compatibility with ruby 1.8
+
+
 == 2011-11-11 version 0.3.6
 
 * Show big warning message when disabling logger
