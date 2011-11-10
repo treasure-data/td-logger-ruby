@@ -63,23 +63,23 @@ module Agent::Rails
         yaml = ERB.new(src).result
         env_conf = YAML.load(yaml)
       rescue
-        logger.warn "Can't load #{CONFIG_PATH} file: #{$!}"
-        logger.warn "Disabling Treasure Data event logger."
+        logger.warn "WARNING: Can't load #{CONFIG_PATH} file: #{$!}"
+        logger.warn "WARNING: Disabling Treasure Data event logger."
         return nil
       end
 
       conf = env_conf[::Rails.env] if conf.is_a?(Hash)
       unless conf
-        logger.warn "#{CONFIG_PATH} doesn't include setting for current environment (#{::Rails.env})."
-        logger.warn "Disabling Treasure Data event logger."
+        logger.warn "WARNING: #{CONFIG_PATH} doesn't include setting for current environment (#{::Rails.env})."
+        logger.warn "WARNING: Disabling Treasure Data event logger."
         return nil
       end
 
       begin
         return Config.new(conf)
       rescue
-        logger.warn "#{CONFIG_PATH}: #{$!}."
-        logger.warn "Disabling Treasure Data event logger."
+        logger.warn "WARNING: #{CONFIG_PATH}: #{$!}."
+        logger.warn "WARNING: Disabling Treasure Data event logger."
         return nil
       end
     end
@@ -88,8 +88,8 @@ module Agent::Rails
       apikey = ENV['TREASURE_DATA_API_KEY'] || ENV['TD_API_KEY']
 
       unless apikey
-        logger.warn "#{CONFIG_PATH} does not exist."
-        logger.warn "Disabling Treasure Data event logger."
+        logger.warn "WARNING: #{CONFIG_PATH} does not exist."
+        logger.warn "WARNING: Disabling Treasure Data event logger."
         return nil
       end
 
