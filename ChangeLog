@@ -1,4 +1,9 @@
 
+== 2011-11-10 version 0.3.5
+
+* Write logs to STDERR instead of Rails.logger
+
+
 == 2011-11-10 version 0.3.4
 
 * Raise error database name or table name is invalid
