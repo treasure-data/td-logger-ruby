@@ -47,7 +47,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     require 'net/http'
     require 'cgi'
     require 'logger'
-    require 'td/client'
+    require 'td-client'
 
     @logger = ::Logger.new(STDERR)
     if debug
@@ -156,6 +156,19 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
   end
 
   def add(db, table, msg)
+    begin
+      TreasureData::API.validate_database_name(db)
+    rescue
+      @logger.error("TreasureDataLogger: Invalid database name #{db.inspect}: #{$!}")
+      return false
+    end
+    begin
+      TreasureData::API.validate_table_name(table)
+      @logger.error("TreasureDataLogger: Invalid table name #{table.inspect}: #{$!}")
+    rescue
+      return false
+    end
+
     begin
       data = to_msgpack(msg)
     rescue
