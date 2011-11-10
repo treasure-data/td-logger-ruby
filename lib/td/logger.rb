@@ -22,7 +22,7 @@ module Logger
     @@logger.post(tag, record)
   end
 
-  def self.post_with_time(tag, record={}, time)
+  def self.post_with_time(tag, record, time)
     @@logger.post_with_time(tag, record, time)
   end
 end
