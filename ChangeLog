@@ -1,4 +1,9 @@
 
+== 2011-11-10 version 0.3.4
+
+* Raise error database name or table name is invalid
+
+
 == 2011-11-10 version 0.3.3
 
 * Validate database name and table name before queuing events
