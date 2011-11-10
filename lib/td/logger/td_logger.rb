@@ -67,7 +67,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     @flush_interval = 10
     @max_flush_interval = 300
     @retry_wait = 1.0
-    @retry_limit = 8
+    @retry_limit = 12
 
     @finish = false
     @next_time = Time.now.to_i + @flush_interval
