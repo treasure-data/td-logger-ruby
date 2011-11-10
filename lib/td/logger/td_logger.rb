@@ -166,7 +166,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
       TreasureData::API.validate_table_name(table)
     rescue
       @logger.error "TreasureDataLogger: Invalid table name #{table.inspect}: #{$!}"
-      raise "Invalid database name #{table.inspect}: #{$!}"
+      raise "Invalid table name #{table.inspect}: #{$!}"
     end
 
     begin
