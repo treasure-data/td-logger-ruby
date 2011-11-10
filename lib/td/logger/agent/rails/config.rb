@@ -68,7 +68,7 @@ module Agent::Rails
         return nil
       end
 
-      conf = env_conf[::Rails.env] if conf.is_a?(Hash)
+      conf = env_conf[::Rails.env] if env_conf.is_a?(Hash)
       unless conf
         logger.warn "WARNING: #{CONFIG_PATH} doesn't include setting for current environment (#{::Rails.env})."
         logger.warn "WARNING: Disabling Treasure Data event logger."
