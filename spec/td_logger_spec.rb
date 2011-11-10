@@ -26,14 +26,22 @@ describe TreasureData::Logger::TreasureDataLogger do
   context 'validate' do
     it 'validate table name' do
       td = TreasureData::Logger::TreasureDataLogger.new('db1', :apikey=>'test')
-      td.post('invalid-name', {}).should == false
-      td.post('', {}).should == false
-      td.post('9', {}).should == false
+      proc {
+        td.post('invalid-name', {})
+      }.should raise_error(RuntimeError)
+      proc {
+        td.post('', {})
+      }.should raise_error(RuntimeError)
+      proc {
+        td.post('9', {})
+      }.should raise_error(RuntimeError)
     end
 
     it 'validate database name' do
       td = TreasureData::Logger::TreasureDataLogger.new('invalid-db-name', :apikey=>'test')
-      td.post('table', {}).should == false
+      proc {
+        td.post('table', {})
+      }.should raise_error(RuntimeError)
     end
   end
 end
