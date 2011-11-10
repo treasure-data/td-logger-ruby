@@ -1,4 +1,10 @@
 
+== 2011-11-11 version 0.3.6
+
+* Show big warning message when disabling logger
+* Increased upload retry limit to 12
+
+
 == 2011-11-10 version 0.3.5
 
 * Write logs to STDERR instead of Rails.logger
