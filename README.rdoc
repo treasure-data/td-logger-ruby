@@ -1,5 +1,14 @@
 = Treasure Data logging library for Rails
 
+== About
+
+This gem is a *logging* *library* *for* *Treasure* *Data*. The events logged by this module will be uploaded into the cloud. There're two ways to upload:
+
+* 1) direct upload from applications: app -> cloud (used by default)
+* 2) in-direct upload from td-agent: app -> td-agent -> cloud
+
+(1) is more easy to configure and extra setup, but it requires extra memory in the application processes. (2) requires the extra installation of the daemons into your cluster, but lowers the logging impact to your applications. You can choose whether to use, by config file described laster.
+
 == Getting Started
 
 Add the following line to your Gemfile:
@@ -11,18 +20,17 @@ edit +environment.rb+ and add to the initalizer block:
 
     config.gem "td-logger"
 
-And then add +config/treasure_data.yml+ file as following:
+And then add +config/treasure_data.yml+ file as followings. This is a template, which is doing the direct upload from the application processes.
 
-    # logging to Treasure Data directly
     development:
       apikey: "YOUR_API_KEY"
-      database: myapp
+      database: rails_development
       debug_mode: true  # enable debug mode
     
-    # logging via td-agent (fluent)
     production:
-      agent: "localhost:24224"
-      tag: td.myapp
+      apikey: "YOUR_API_KEY"
+      database: rails_production
+      debug_mode: false
     
     # disable logging
     test:
@@ -56,9 +64,38 @@ In rails application, you can use 'TD.event.attribute' to set static attribute t
       end
     end
 
+== Configuration file
+
+=== Direct Upload from Application Buffer
+
+This configuration enables the application to upload the events, directly from the application processes (app -> cloud).
+
+    production:
+      apikey: "YOUR_API_KEY"
+      database: rails_production
+      debug_mode: false
+
+=== In-Direct Upload from td-agent
+
+When 'agent' and 'tag' options are specified, the events are logged into the local td-agent daemon. Later on, the daemon uploads the event periodically to the cloud (app -> td-agent -> cloud).
+
+This requires the additional setup to your infrastructure, but lowers the memory and performance impact to your application processes. For the installation process, please look at our {knowledge base}[http://help.treasure-data.com/kb/installing-td-agent-daemon] page.
+
+NOTE: This configuration is not supported on PaaP platforms.
+
+    production:
+      agent: "localhost:24224"
+      tag: td.myapp
+      debug_mode: false
+
+== Further Readings
+
+If you have any problem, please ask us from the support site.
+
+* {Support Site}[http://help.treasure-data.com/]
+* {Knowledge Base}[http://help.treasure-data.com/kb]
 
 == Copyright
 
 Copyright:: Copyright (c) 2011 Treasure Data Inc.
 License::   Apache License, Version 2.0
-
