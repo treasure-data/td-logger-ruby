@@ -46,7 +46,7 @@ module Agent::Rails
     end
 
     def self.init
-      logger = ::Rails.logger || ::Logger.new(STDERR)
+      logger = ::Logger.new(STDERR)
       if File.exist?("#{::Rails.root}/#{CONFIG_PATH}")
         load_file(logger)
       else
@@ -68,7 +68,7 @@ module Agent::Rails
         return nil
       end
 
-      conf = env_conf[::Rails.env]
+      conf = env_conf[::Rails.env] if conf.is_a?(Hash)
       unless conf
         logger.warn "#{CONFIG_PATH} doesn't include setting for current environment (#{::Rails.env})."
         logger.warn "Disabling Treasure Data event logger."
