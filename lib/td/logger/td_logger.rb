@@ -64,6 +64,8 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     @queue = []
 
     @chunk_limit = 8*1024*1024
+    @queue_limit = 50
+
     @flush_interval = 10
     @max_flush_interval = 300
     @retry_wait = 1.0
@@ -179,6 +181,11 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     key = [db, table]
 
     @mutex.synchronize do
+      if @queue.length > @queue_limit
+        @logger.error("TreasureDataLogger: queue length exceeds limit. can't add new event log: #{msg.inspect}")
+        return false
+      end
+
       buffer = (@map[key] ||= '')
 
       buffer << data
