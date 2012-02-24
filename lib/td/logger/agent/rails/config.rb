@@ -104,9 +104,9 @@ module Agent::Rails
         return nil
       end
 
-      apikey = env_conf['td']['TREASURE_DATA_API_KEY'] if env_conf.is_a?(Hash)
+      apikey = env_conf['td']['TREASURE_DATA_API_KEY'] if env_conf.is_a?(Hash) and env_conf['td'].is_a?(Hash)
       unless apikey
-        logger.warn "WARNING: #{path} does not exist."
+        logger.warn "WARNING: #{path} does not have a configuration of API key."
         logger.warn "WARNING: Disabling Treasure Data event logger."
         return nil
       end
