@@ -1,4 +1,10 @@
 
+== 2012-02-24 version 0.3.8
+
+* Supports for EngineYard Add-on users
+* Limit length of upload queue upto 50
+
+
 == 2011-11-11 version 0.3.7
 
 * Use bundler for packaging
