@@ -92,10 +92,11 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
       @upload_thread.join if @upload_thread
 
       @map.each {|(db,table),buffer|
-        upload(db, table, buffer)
+        data = buffer.flush!
+        upload(db, table, data)
       }
-      @queue.each {|tuple|
-        upload(*tuple)
+      @queue.each {|db,table,data|
+        upload(ddb, data, table)
       }
     end
   end
@@ -149,6 +150,46 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
   end
 
   private
+  MAX_KEY_CARDINALITY = 512
+  WARN_KEY_CARDINALITY = 256
+
+  class Buffer
+    def initialize
+      @key_set = {}
+      @data = StringIO.new
+      @gz = Zlib::GzipWriter.new(@data)
+    end
+
+    def key_set_size
+      @key_set.size
+    end
+
+    def update_key_set(record)
+      record.each_key {|key|
+        @key_set[key] = true
+      }
+      @key_set.size
+    end
+
+    def append(data)
+      @gz << data
+      map = MessagePack.unpack(data)
+    end
+
+    def size
+      @data.size
+    end
+
+    def flush!
+      close
+      @data.string
+    end
+
+    def close
+      @gz.close unless @gz.closed?
+    end
+  end
+
   def to_msgpack(msg)
     begin
       msg.to_msgpack
@@ -186,12 +227,30 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
         return false
       end
 
-      buffer = (@map[key] ||= '')
+      buffer = (@map[key] ||= Buffer.new)
 
-      buffer << data
+      record = MessagePack.unpack(data)
+      unless record.is_a?(Hash)
+        @logger.error("TreasureDataLogger: record must be a Hash: #{msg.inspect}")
+        return false
+      end
+
+      before = buffer.key_set_size
+      after = buffer.update_key_set(record)
+      if after > MAX_KEY_CARDINALITY
+        @logger.error("TreasureDataLogger: kind of keys in a buffer exceeds #{MAX_KEY_CARDINALITY}.")
+        @map.delete(key)
+        return false
+      end
+      if before <= WARN_KEY_CARDINALITY && after > WARN_KEY_CARDINALITY
+        @logger.warn("TreasureDataLogger: kind of keys in a buffer exceeds #{WARN_KEY_CARDINALITY} which is too large. please check the schema design.")
+      end
+
+      buffer.append(data)
 
       if buffer.size > @chunk_limit
-        @queue << [db, table, buffer]
+        data = buffer.flush!
+        @queue << [db, table, data]
         @map.delete(key)
         @cond.signal
       end
@@ -209,7 +268,8 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     @mutex.synchronize do
       if @queue.empty?
         @map.reject! {|(db,table),buffer|
-          @queue << [db, table, buffer]
+          data = buffer.flush!
+          @queue << [db, table, data]
         }
       end
     end
@@ -217,10 +277,10 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     flushed = false
 
     until @queue.empty?
-      tuple = @queue.first
+      db, table, data = @queue.first
 
       begin
-        upload(*tuple)
+        upload(db, table, data)
         @queue.shift
         @error_count = 0
         flushed = true
@@ -243,11 +303,9 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     flushed
   end
 
-  def upload(db, table, buffer)
+  def upload(db, table, data)
     begin
-      out = StringIO.new
-      Zlib::GzipWriter.wrap(out) {|gz| gz.write buffer }
-      stream = StringIO.new(out.string)
+      stream = StringIO.new(data)
 
       @logger.debug "Uploading event logs to #{db}.#{table} table on Treasure Data (#{stream.size} bytes)"
 
