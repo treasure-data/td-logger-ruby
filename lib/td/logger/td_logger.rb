@@ -271,6 +271,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     close
   end
 
+  require 'thread'  # ConditionVariable
   if ConditionVariable.new.method(:wait).arity == 1
     # "WARNING: Running on Ruby 1.8. Ruby 1.9 is recommended."
     require 'timeout'
