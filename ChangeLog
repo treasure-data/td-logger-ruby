@@ -1,4 +1,10 @@
 
+== 2012-03-05 version 0.3.9
+
+* Fixed 'ConditionVariable' is not defined problem
+* Fixed Event.use feature
+
+
 == 2012-02-24 version 0.3.8
 
 * Supports for EngineYard Add-on users
