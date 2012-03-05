@@ -1,12 +1,6 @@
 module TreasureData
 module Logger
 
-  module Event
-    def self.use(mod)
-      send(:include, mod)
-    end
-  end
-
   module EventPreset
     def action(name, record, uid=TD.event.attribute[:uid])
       unless uid
@@ -37,9 +31,7 @@ module Logger
     end
   end
 
-  Event.use EventPreset
-
-  class EventCollector
+  class Event
     def initialize
       @attribute = {}
     end
@@ -50,11 +42,15 @@ module Logger
       TreasureData::Logger.post(action, @attribute.merge(record))
     end
 
-    include Event
+    def self.use(mod)
+      send(:include, mod)
+    end
   end
 
+  Event.use EventPreset
+
   def self.event
-    Thread.current[:td_event_collector] ||= EventCollector.new
+    Thread.current[:td_event] ||= Event.new
   end
 
 end
