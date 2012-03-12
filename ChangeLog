@@ -1,4 +1,9 @@
 
+== 2012-03-12 version 0.3.11
+
+* Added TD.event.post_with_time(action, record, time) method
+
+
 == 2012-03-05 version 0.3.10
 
 * Fixed 'ConditionVariable' is not defined problem
