@@ -42,6 +42,10 @@ module Logger
       TreasureData::Logger.post(action, @attribute.merge(record))
     end
 
+    def post_with_time(action, record, time)
+      TreasureData::Logger.post_with_time(action, @attribute.merge(record), time)
+    end
+
     def self.use(mod)
       send(:include, mod)
     end
