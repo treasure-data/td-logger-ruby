@@ -7,24 +7,15 @@ module Agent::Rails
       ::ActionController::Base.send(:include, self)
     end
 
-    if defined?(ActiveSupport::Concern)
-      extend ActiveSupport::Concern
-    else
-      # Rails 2
-      def self.included(mod)
-        im = InstanceMethods
-        cm = ClassMethods
-        mod.class_eval do
-          include im
-          extend cm
-        end
+    def self.included(mod)
+      cm = ClassMethods
+      mod.class_eval do
+        extend cm
       end
     end
 
-    module InstanceMethods
-      def event
-        TreasureData::Logger.event
-      end
+    def event
+      TreasureData::Logger.event
     end
 
     module ClassMethods
