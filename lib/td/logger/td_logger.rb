@@ -66,7 +66,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     @chunk_limit = 8*1024*1024
     @queue_limit = 50
 
-    @flush_interval = 10
+    @flush_interval = 2
     @max_flush_interval = 300
     @retry_wait = 1.0
     @retry_limit = 12
@@ -136,7 +136,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
 
       if @error_count == 0
         if flushed && @flush_interval < @max_flush_interval
-          @flush_interval = [@flush_interval + 10, @max_flush_interval].min
+          @flush_interval = [@flush_interval ** 2, @max_flush_interval].min
         end
         next_wait = @flush_interval
       else
