@@ -91,19 +91,23 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
       }
       @upload_thread.join if @upload_thread
 
-      @queue.reverse_each {|db,table,data|
+      @queue.reject! {|db,table,data|
         begin
-          upload(ddb, data, table)
+          upload(db, table, data)
+          true
         rescue
           @logger.error "Failed to upload event logs to Treasure Data, trashed: #{$!}"
+          false
         end
       }
-      @map.each_pair {|(db,table),buffer|
+      @map.reject! {|(db,table),buffer|
         data = buffer.flush!
         begin
           upload(db, table, data)
+          true
         rescue
           @logger.error "Failed to upload event logs to Treasure Data, trashed: #{$!}"
+          false
         end
       }
     end
@@ -126,18 +130,13 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
       now = Time.now.to_i
 
       if @next_time <= now || (@flush_now && @error_count == 0)
-        @mutex.unlock
-        begin
-          flushed = try_flush
-        ensure
-          @mutex.lock
-        end
+        flushed = try_flush
         @flush_now = false
       end
 
       if @error_count == 0
         if flushed && @flush_interval < @max_flush_interval
-          @flush_interval = [@flush_interval + 60, @max_flush_interval].min
+          @flush_interval = [@flush_interval + 10, @max_flush_interval].min
         end
         next_wait = @flush_interval
       else
@@ -181,7 +180,6 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
 
     def append(data)
       @gz << data
-      map = MessagePack.unpack(data)
     end
 
     def size
@@ -257,6 +255,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
       buffer.append(data)
 
       if buffer.size > @chunk_limit
+        # flush this buffer
         data = buffer.flush!
         @queue << [db, table, data]
         @map.delete(key)
@@ -272,43 +271,55 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     true
   end
 
+  # assume @mutex is locked
   def try_flush
-    @mutex.synchronize do
-      if @queue.empty?
-        @map.reject! {|(db,table),buffer|
-          data = buffer.flush!
-          @queue << [db, table, data]
-        }
-      end
+    # force flush small buffers if queue is empty
+    if @queue.empty?
+      @map.reject! {|(db,table),buffer|
+        data = buffer.flush!
+        @queue << [db, table, data]
+      }
+    end
+
+    if @queue.empty?
+      return false
     end
 
     flushed = false
 
-    until @queue.empty?
-      db, table, data = @queue.first
+    @mutex.unlock
+    begin
+      until @queue.empty?
+        db, table, data = @queue.first
 
-      begin
-        upload(db, table, data)
-        @queue.shift
-        @error_count = 0
-        flushed = true
-      rescue
-        if @error_count < @retry_limit
-          @logger.error "Failed to upload event logs to Treasure Data, retrying: #{$!}"
-          @error_count += 1
-        else
-          @logger.error "Failed to upload event logs to Treasure Data, trashed: #{$!}"
-          $!.backtrace.each {|bt|
-            @logger.info bt
-          }
+        begin
+          upload(db, table, data)
+          @queue.shift
           @error_count = 0
-          @queue.clear
+          flushed = true
+
+        rescue
+          if @error_count < @retry_limit
+            @logger.error "Failed to upload event logs to Treasure Data, retrying: #{$!}"
+            @error_count += 1
+          else
+            @logger.error "Failed to upload event logs to Treasure Data, trashed: #{$!}"
+            $!.backtrace.each {|bt|
+              @logger.info bt
+            }
+            @error_count = 0
+            @queue.clear
+          end
+          return nil
+
         end
-        return
       end
+
+    ensure
+      @mutex.lock
     end
 
-    flushed
+    return flushed
   end
 
   def upload(db, table, data)
