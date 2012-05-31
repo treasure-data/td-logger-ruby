@@ -1,4 +1,12 @@
 
+== 2012-03-31 version 0.3.12
+
+* TreasureDataLogger#close shows a error message if upload failed
+  instead of raising errors
+* TreasureDataLogger#close deletes uploaded queue entry
+* Changed increment storategy of flush_interval from += 10 to ** 2
+
+
 == 2012-03-12 version 0.3.11
 
 * Added TD.event.post_with_time(action, record, time) method
