@@ -9,7 +9,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
       obj = allocate
       obj.instance_eval { initialize(*args, &block) }
       dc = DelegateClass(obj.class).new(obj)
-      ObjectSpace.define_finalizer(dc, finalizer(obj))
+      ObjectSpace.define_finalizer(obj, finalizer(obj))
       dc
     end
 
@@ -91,12 +91,20 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
       }
       @upload_thread.join if @upload_thread
 
-      @map.each {|(db,table),buffer|
-        data = buffer.flush!
-        upload(db, table, data)
+      @queue.reverse_each {|db,table,data|
+        begin
+          upload(ddb, data, table)
+        rescue
+          @logger.error "Failed to upload event logs to Treasure Data, trashed: #{$!}"
+        end
       }
-      @queue.each {|db,table,data|
-        upload(ddb, data, table)
+      @map.each_pair {|(db,table),buffer|
+        data = buffer.flush!
+        begin
+          upload(db, table, data)
+        rescue
+          @logger.error "Failed to upload event logs to Treasure Data, trashed: #{$!}"
+        end
       }
     end
   end
