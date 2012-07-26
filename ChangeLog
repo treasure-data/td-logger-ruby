@@ -1,4 +1,10 @@
 
+== 2012-07-26 version 0.3.13
+
+* Rails agent supports TREASURE_DATA_YML environment variable to change
+  configuration file path from 'config/treasure_data.yml'
+
+
 == 2012-05-31 version 0.3.12
 
 * TreasureDataLogger#close shows a error message if upload failed
