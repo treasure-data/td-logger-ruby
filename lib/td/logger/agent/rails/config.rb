@@ -47,36 +47,41 @@ module Agent::Rails
 
     def self.init
       logger = ::Logger.new(STDERR)
-      if File.exist?("#{::Rails.root}/#{CONFIG_PATH}")
-        load_file(logger)
+
+      if CONFIG_PATH[0] == ?/
+        config_path = CONFIG_PATH
       else
-        if File.exist?("#{::Rails.root}/#{CONFIG_PATH_EY_DEPLOY}")
-          load_file_ey(logger, "#{::Rails.root}/#{CONFIG_PATH_EY_DEPLOY}")
-        elsif File.exist?("#{::Rails.root}/#{CONFIG_PATH_EY_LOCAL}")
-          load_file_ey(logger, "#{::Rails.root}/#{CONFIG_PATH_EY_LOCAL}")
-        else
-          load_env(logger)
-        end
+        config_path = "#{::Rails.root}/#{CONFIG_PATH}"
+      end
+
+      if File.exist?(config_path)
+        load_file(logger, config_path)
+      elsif File.exist?("#{::Rails.root}/#{CONFIG_PATH_EY_DEPLOY}")
+        load_file_ey(logger, "#{::Rails.root}/#{CONFIG_PATH_EY_DEPLOY}")
+      elsif File.exist?("#{::Rails.root}/#{CONFIG_PATH_EY_LOCAL}")
+        load_file_ey(logger, "#{::Rails.root}/#{CONFIG_PATH_EY_LOCAL}")
+      else
+        load_env(logger)
       end
     end
 
-    def self.load_file(logger)
+    def self.load_file(logger, path="#{::Rails.root}/#{CONFIG_PATH}")
       require 'yaml'
       require 'erb'
 
       begin
-        src = File.read("#{::Rails.root}/#{CONFIG_PATH}")
+        src = File.read(path)
         yaml = ERB.new(src).result
         env_conf = YAML.load(yaml)
       rescue
-        logger.warn "WARNING: Can't load #{CONFIG_PATH} file: #{$!}"
+        logger.warn "WARNING: Can't load #{path} file: #{$!}"
         logger.warn "WARNING: Disabling Treasure Data event logger."
         return nil
       end
 
       conf = env_conf[::Rails.env] if env_conf.is_a?(Hash)
       unless conf
-        logger.warn "WARNING: #{CONFIG_PATH} doesn't include setting for current environment (#{::Rails.env})."
+        logger.warn "WARNING: #{path} doesn't include setting for current environment (#{::Rails.env})."
         logger.warn "WARNING: Disabling Treasure Data event logger."
         return nil
       end
@@ -84,7 +89,7 @@ module Agent::Rails
       begin
         return Config.new(conf)
       rescue
-        logger.warn "WARNING: #{CONFIG_PATH}: #{$!}."
+        logger.warn "WARNING: #{path}: #{$!}."
         logger.warn "WARNING: Disabling Treasure Data event logger."
         return nil
       end
