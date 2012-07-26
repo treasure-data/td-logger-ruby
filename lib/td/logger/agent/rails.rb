@@ -2,7 +2,7 @@ module TreasureData
 module Logger
 module Agent::Rails
 
-  CONFIG_PATH = 'config/treasure_data.yml'
+  CONFIG_PATH = ENV['TREASURE_DATA_YML'] || 'config/treasure_data.yml'
   CONFIG_PATH_EY_LOCAL = 'config/ey_services_config_local.yml'
   CONFIG_PATH_EY_DEPLOY = 'config/ey_services_config_deploy.yml'
 
