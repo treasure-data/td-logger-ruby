@@ -1,4 +1,10 @@
 
+== 2012-07-26 version 0.3.14
+
+* Rails agent assumes TREASURE_DATA_YML environment variable is an
+  absolute path if it starts with '/'
+
+
 == 2012-07-26 version 0.3.13
 
 * Rails agent supports TREASURE_DATA_YML environment variable to change
