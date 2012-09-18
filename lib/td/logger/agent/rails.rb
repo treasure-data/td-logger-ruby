@@ -47,6 +47,14 @@ module Agent::Rails
     TreasureData::Logger::Agent::Rails.init(::Rails.configuration)
   end
 
+  # implement ActiveSupport::TimeWithZone#to_msgpack
+  unless ActiveSupport::TimeWithZone.instance_methods.include?('to_msgpack')
+    class ActiveSupport::TimeWithZone
+      def to_msgpack(out='')
+        strftime("%Y-%m-%d %H:%M:%S %z").to_msgpack(out)
+      end
+    end
+  end
 end
 end
 end
