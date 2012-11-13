@@ -36,6 +36,11 @@ class ActionController
   end
 end
 
+class ActiveSupport
+  class TimeWithZone
+  end
+end
+
 require 'td/logger/agent/rails'
 
 describe TreasureData::Logger::Agent::Rails::Config do
@@ -114,3 +119,8 @@ EOF
   end
 end
 
+describe ActiveSupport::TimeWithZone do
+  it 'has to_msgpack' do
+    ActiveSupport::TimeWithZone.method_defined?(:to_msgpack).should be_true
+  end
+end
