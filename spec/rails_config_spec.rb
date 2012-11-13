@@ -36,6 +36,11 @@ class ActionController
   end
 end
 
+class ActiveSupport
+  class TimeWithZone
+  end
+end
+
 require 'td/logger/agent/rails'
 
 describe TreasureData::Logger::Agent::Rails::Config do
