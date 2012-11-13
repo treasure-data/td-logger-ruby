@@ -119,3 +119,8 @@ EOF
   end
 end
 
+describe ActiveSupport::TimeWithZone do
+  it 'has to_msgpack' do
+    ActiveSupport::TimeWithZone.method_defined?(:to_msgpack).should be_true
+  end
+end
