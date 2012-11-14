@@ -3,7 +3,7 @@ module Logger
 module Agent::Rails
 
   class Config
-    def initialize(conf)
+    def assign_conf(conf)
       if agent = conf['agent']
         host, port = agent.split(':',2)
         port = (port || 24224).to_i
@@ -36,6 +36,7 @@ module Agent::Rails
     attr_reader :agent_host, :agent_port, :tag
     attr_reader :apikey, :database, :auto_create_table
     attr_reader :access_log_table, :debug_mode
+    attr_accessor :disabled
 
     def agent_mode?
       @agent_host != nil
@@ -46,77 +47,38 @@ module Agent::Rails
     end
 
     def self.init
-      logger = ::Logger.new(STDERR)
-
-      if CONFIG_PATH[0] == ?/
-        config_path = CONFIG_PATH
-      else
-        config_path = "#{::Rails.root}/#{CONFIG_PATH}"
-      end
+      c = Config.new
+      config_path = CONFIG_PATH.start_with?('/') ? CONFIG_PATH : "#{::Rails.root}/#{CONFIG_PATH}"
 
       if File.exist?(config_path)
-        load_file(logger, config_path)
-      elsif File.exist?("#{::Rails.root}/#{CONFIG_PATH_EY_DEPLOY}")
-        load_file_ey(logger, "#{::Rails.root}/#{CONFIG_PATH_EY_DEPLOY}")
-      elsif File.exist?("#{::Rails.root}/#{CONFIG_PATH_EY_LOCAL}")
-        load_file_ey(logger, "#{::Rails.root}/#{CONFIG_PATH_EY_LOCAL}")
+        c.load_file(config_path)
+      elsif File.exist?(CONFIG_PATH_EY_DEPLOY)
+        c.load_file_ey(CONFIG_PATH_EY_DEPLOY)
+      elsif File.exist?(CONFIG_PATH_EY_LOCAL)
+        c.load_file_ey(CONFIG_PATH_EY_LOCAL)
       else
-        load_env(logger)
+        c.load_env
       end
+
+      return c
+    rescue
+      warn "Disabling Treasure Data event logger: #{$!}"
+      c.disabled = true
+      return c
     end
 
-    def self.load_file(logger, path="#{::Rails.root}/#{CONFIG_PATH}")
-      require 'yaml'
-      require 'erb'
-
-      begin
-        src = File.read(path)
-        yaml = ERB.new(src).result
-        env_conf = YAML.load(yaml)
-      rescue
-        logger.warn "WARNING: Can't load #{path} file: #{$!}"
-        logger.warn "WARNING: Disabling Treasure Data event logger."
-        return nil
-      end
-
-      conf = env_conf[::Rails.env] if env_conf.is_a?(Hash)
-      unless conf
-        logger.warn "WARNING: #{path} doesn't include setting for current environment (#{::Rails.env})."
-        logger.warn "WARNING: Disabling Treasure Data event logger."
-        return nil
-      end
-
-      begin
-        return Config.new(conf)
-      rescue
-        logger.warn "WARNING: #{path}: #{$!}."
-        logger.warn "WARNING: Disabling Treasure Data event logger."
-        return nil
-      end
+    def load_file(path)
+      conf = load_yaml(path)[::Rails.env]
+      @disabled = true and return unless conf
+      assign_conf(conf)
     end
 
-    def self.load_file_ey(logger, path)
-      require 'yaml'
-      require 'erb'
+    def load_file_ey(path)
+      conf = load_yaml(path)
+      apikey = conf['td']['TREASURE_DATA_API_KEY'] if conf.is_a?(Hash) and conf['td'].is_a?(Hash)
+      @disabled = true and return unless apikey
 
-      begin
-        src = File.read(path)
-        yaml = ERB.new(src).result
-        env_conf = YAML.load(yaml)
-      rescue
-        logger.warn "WARNING: Can't load #{path} file: #{$!}"
-        logger.warn "WARNING: Disabling Treasure Data event logger."
-        return nil
-      end
-
-      apikey = env_conf['td']['TREASURE_DATA_API_KEY'] if env_conf.is_a?(Hash) and env_conf['td'].is_a?(Hash)
-      unless apikey
-        logger.warn "WARNING: #{path} does not have a configuration of API key."
-        logger.warn "WARNING: Disabling Treasure Data event logger."
-        return nil
-      end
-
-      return Config.new({
+      assign_conf({
         'apikey' => apikey,
         'database' => ENV['TREASURE_DATA_DB'] || "rails_#{::Rails.env}",
         'access_log_table' => ENV['TREASURE_DATA_ACCESS_LOG_TABLE'],
@@ -124,21 +86,25 @@ module Agent::Rails
       })
     end
 
-    def self.load_env(logger)
+    def load_env
       apikey = ENV['TREASURE_DATA_API_KEY'] || ENV['TD_API_KEY']
+      @disabled = true and return unless apikey
 
-      unless apikey
-        logger.warn "WARNING: #{CONFIG_PATH} does not exist."
-        logger.warn "WARNING: Disabling Treasure Data event logger."
-        return nil
-      end
-
-      return Config.new({
+      assign_conf({
         'apikey' => apikey,
         'database' => ENV['TREASURE_DATA_DB'] || "rails_#{::Rails.env}",
         'access_log_table' => ENV['TREASURE_DATA_ACCESS_LOG_TABLE'],
         'auto_create_table' => true
       })
+    end
+
+    def load_yaml(path)
+      require 'yaml'
+      require 'erb'
+
+      src = File.read(path)
+      yaml = ERB.new(src).result
+      YAML.load(yaml)
     end
   end
 

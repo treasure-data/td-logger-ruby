@@ -3,8 +3,8 @@ module Logger
 module Agent::Rails
 
   CONFIG_PATH = ENV['TREASURE_DATA_YML'] || 'config/treasure_data.yml'
-  CONFIG_PATH_EY_LOCAL = 'config/ey_services_config_local.yml'
-  CONFIG_PATH_EY_DEPLOY = 'config/ey_services_config_deploy.yml'
+  CONFIG_PATH_EY_LOCAL = "#{::Rails.root}/config/ey_services_config_local.yml"
+  CONFIG_PATH_EY_DEPLOY = "#{::Rails.root}/config/ey_services_config_deploy.yml"
 
   require 'td/logger/agent/rack'
   require 'td/logger/agent/rails/config'
@@ -13,7 +13,7 @@ module Agent::Rails
 
   def self.init(rails)
     c = Config.init
-    unless c
+    if c.disabled
       ::TreasureData::Logger.open_null
       return false
     end
