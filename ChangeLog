@@ -1,3 +1,9 @@
+== 2012-11-14 version 0.3.15
+
+* Removing InstanceMethods as it is deprecated in Rails 3.2 and
+  yields warning. issue #3
+* Add ActiveSupport::TimeWithZone#to_msgpack. issue #4
+
 
 == 2012-07-26 version 0.3.14
 
