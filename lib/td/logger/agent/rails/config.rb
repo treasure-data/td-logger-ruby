@@ -69,14 +69,23 @@ module Agent::Rails
 
     def load_file(path)
       conf = load_yaml(path)[::Rails.env]
-      @disabled = true and return unless conf
+
+      unless conf
+        @disable = true
+        return
+      end
+
       assign_conf(conf)
     end
 
     def load_file_ey(path)
       conf = load_yaml(path)
       apikey = conf['td']['TREASURE_DATA_API_KEY'] if conf.is_a?(Hash) and conf['td'].is_a?(Hash)
-      @disabled = true and return unless apikey
+
+      unless conf
+        @disable = true
+        return
+      end
 
       assign_conf({
         'apikey' => apikey,
@@ -88,7 +97,11 @@ module Agent::Rails
 
     def load_env
       apikey = ENV['TREASURE_DATA_API_KEY'] || ENV['TD_API_KEY']
-      @disabled = true and return unless apikey
+
+      unless conf
+        @disable = true
+        return
+      end
 
       assign_conf({
         'apikey' => apikey,
