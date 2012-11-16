@@ -56,6 +56,7 @@ describe TreasureData::Logger::Agent::Rails::Config do
       ENV['TREASURE_DATA_API_KEY'] = 'test1'
       ENV['TREASURE_DATA_DB'] = 'db1'
       c = TreasureData::Logger::Agent::Rails::Config.init
+      c.disabled.should == false
       c.agent_mode?.should == false
       c.apikey.should == 'test1'
       c.database.should == 'db1'
@@ -73,11 +74,26 @@ test:
 EOF
       }
       c = TreasureData::Logger::Agent::Rails::Config.init
+      c.disabled.should == false
       c.agent_mode?.should == false
       c.apikey.should == 'test2'
       c.database.should == 'db2'
       c.auto_create_table.should == true
       c.debug_mode.should == true
+    end
+
+    it 'load_file without test' do
+      FileUtils.mkdir_p("#{TMP_DIR}/config")
+      File.open("#{TMP_DIR}/config/treasure_data.yml", "w") {|f|
+        f.write <<EOF
+development:
+  apikey: test2
+  database: db2
+  debug_mode: true
+EOF
+      }
+      c = TreasureData::Logger::Agent::Rails::Config.init
+      c.disabled.should == true
     end
 
     it 'prefer file than env' do
@@ -94,6 +110,7 @@ test:
 EOF
       }
       c = TreasureData::Logger::Agent::Rails::Config.init
+      c.disabled.should == false
       c.agent_mode?.should == false
       c.apikey.should == 'test4'
       c.database.should == 'db4'
@@ -111,6 +128,7 @@ test:
 EOF
       }
       c = TreasureData::Logger::Agent::Rails::Config.init
+      c.disabled.should == false
       c.agent_mode?.should == true
       c.tag.should == 'td.db5'
       c.agent_host.should == 'localhost'

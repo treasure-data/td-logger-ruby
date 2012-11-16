@@ -38,6 +38,10 @@ module Agent::Rails
     attr_reader :access_log_table, :debug_mode
     attr_accessor :disabled
 
+    def initialize
+      @disabled = false
+    end
+
     def agent_mode?
       @agent_host != nil
     end
@@ -82,7 +86,7 @@ module Agent::Rails
       conf = load_yaml(path)
       apikey = conf['td']['TREASURE_DATA_API_KEY'] if conf.is_a?(Hash) and conf['td'].is_a?(Hash)
 
-      unless conf
+      unless apikey
         @disabled = true
         return
       end
@@ -98,7 +102,7 @@ module Agent::Rails
     def load_env
       apikey = ENV['TREASURE_DATA_API_KEY'] || ENV['TD_API_KEY']
 
-      unless conf
+      unless apikey
         @disabled = true
         return
       end

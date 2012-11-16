@@ -14,6 +14,7 @@ module Agent::Rails
   def self.init(rails)
     c = Config.init
     if c.disabled
+      warn 'Disabling Treasure Data event logger.'
       ::TreasureData::Logger.open_null
       return false
     end
