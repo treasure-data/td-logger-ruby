@@ -71,7 +71,7 @@ module Agent::Rails
       conf = load_yaml(path)[::Rails.env]
 
       unless conf
-        @disable = true
+        @disabled = true
         return
       end
 
@@ -83,7 +83,7 @@ module Agent::Rails
       apikey = conf['td']['TREASURE_DATA_API_KEY'] if conf.is_a?(Hash) and conf['td'].is_a?(Hash)
 
       unless conf
-        @disable = true
+        @disabled = true
         return
       end
 
@@ -99,7 +99,7 @@ module Agent::Rails
       apikey = ENV['TREASURE_DATA_API_KEY'] || ENV['TD_API_KEY']
 
       unless conf
-        @disable = true
+        @disabled = true
         return
       end
 
