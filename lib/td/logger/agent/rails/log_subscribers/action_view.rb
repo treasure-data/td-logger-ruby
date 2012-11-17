@@ -1,24 +1,29 @@
 require 'active_support/log_subscriber'
+require 'td/logger/agent/rails/log_subscribers'
 
 module TreasureData
 module Logger
 module Agent::Rails
   class ViewLogSubscriber < ActiveSupport::LogSubscriber
+    AV_TABLE_NAME = 'view_actions'
+
     def render_template(event)
-      message = "  Rendered #{from_rails_root(event.payload[:identifier])}"
-      message << " within #{from_rails_root(event.payload[:layout])}" if event.payload[:layout]
-      message << (" (%.1fms)" % event.duration)
-      info(message)
+      payload = build_payload(event, 'render_template')
+      LogSubscribersHelper::post(AV_TABLE_NAME, event.time, payload)
     end
     alias :render_partial :render_template
     alias :render_collection :render_template
 
-    # TODO: Ideally, ActionView should have its own logger so it does not depend on AC.logger
-    def logger
-      ActionController::Base.logger if defined?(ActionController::Base)
-    end
+    private
 
-  protected
+    def build_payload(event, subscribe)
+      payload = LogSubscribersHelper::build_payload(event, subscribe)
+
+      payload[:identifier] = from_rails_root(payload[:identifier])
+      payload[:layout] = from_rails_root(payload[:layout]) if payload[:layout]
+
+      payload
+    end
 
     def from_rails_root(string)
       string.sub("#{Rails.root}/", "").sub(/^app\/views\//, "")

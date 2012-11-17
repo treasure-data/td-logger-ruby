@@ -1,68 +1,74 @@
 require 'active_support/core_ext/object/blank'
 require 'active_support/log_subscriber'
+require 'td/logger/agent/rails/log_subscribers'
 
 module TreasureData
 module Logger
 module Agent::Rails
   class ControllerLogSubscriber < ActiveSupport::LogSubscriber
-    INTERNAL_PARAMS = %w(controller action format _method only_path)
+    AC_TABLE_NAME = 'controller_actions'
 
     def start_processing(event)
-      payload = event.payload
-      params  = payload[:params].except(*INTERNAL_PARAMS)
-      format  = payload[:format]
-      format  = format.to_s.upcase if format.is_a?(Symbol)
-
-      info "Processing by #{payload[:controller]}##{payload[:action]} as #{format}"
-      info "  Parameters: #{params.inspect}" unless params.empty?
+      payload = build_payload(event, 'start_processing')
+      LogSubscribersHelper::post(AC_TABLE_NAME, event.time, payload)
     end
 
     def process_action(event)
-      payload   = event.payload
-      additions = ActionController::Base.log_process_action(payload)
+      payload = build_payload(event, 'process_action')
 
-      status = payload[:status]
-      if status.nil? && payload[:exception].present?
-        exception_class_name = payload[:exception].first
-        status = ActionDispatch::ExceptionWrapper.status_code_for_exception(exception_class_name)
+      if !payload.has_key?(:status) && payload[:exception].present?
+        exception, message = payload.delete(:exception)
+        payload[:status] = ActionDispatch::ExceptionWrapper.status_code_for_exception(exception)
+        payload[:exception] = "#{exception}:#{message}"
       end
-      message = "Completed #{status} #{Rack::Utils::HTTP_STATUS_CODES[status]} in %.0fms" % event.duration
-      message << " (#{additions.join(" | ")})" unless additions.blank?
 
-      info(message)
-    end
-
-    def halted_callback(event)
-      info "Filter chain halted as #{event.payload[:filter]} rendered or redirected"
+      LogSubscribersHelper::post(AC_TABLE_NAME, event.time, payload)
     end
 
     def send_file(event)
-      message = "Sent file %s"
-      message << " (%.1fms)"
-      info(message % [event.payload[:path], event.duration])
+      payload = build_payload(event, 'send_file')
+      LogSubscribersHelper::post(AC_TABLE_NAME, event.time, payload)
     end
 
     def redirect_to(event)
-      info "Redirected to #{event.payload[:location]}"
+      # Store redirect location into TLS for getting in other actions
+      Thread.current[:redirect_location] = event.payload[:location]
     end
 
     def send_data(event)
-      info("Sent data %s (%.1fms)" % [event.payload[:filename], event.duration])
+      payload = build_payload(event, 'send_data')
+      LogSubscribersHelper::post(AC_TABLE_NAME, event.time, payload)
     end
 
-    %w(write_fragment read_fragment exist_fragment?
-       expire_fragment expire_page write_page).each do |method|
-      class_eval <<-METHOD, __FILE__, __LINE__ + 1
-        def #{method}(event)
-          key_or_path = event.payload[:key] || event.payload[:path]
-          human_name  = #{method.to_s.humanize.inspect}
-          info("\#{human_name} \#{key_or_path} \#{"(%.1fms)" % event.duration}")
-        end
-      METHOD
-    end
+    # Need?
+    #def halted_callback(event)
+    #  payload = build_payload(event, 'halted_callback')
+    #  info "Filter chain halted as #{event.payload[:filter]} rendered or redirected"
+    #end
 
-    def logger
-      ActionController::Base.logger
+    # Need cache related logs?
+    #%w(write_fragment read_fragment exist_fragment?
+    #   expire_fragment expire_page write_page).each do |method|
+    #  class_eval <<-METHOD, __FILE__, __LINE__ + 1
+    #    def #{method}(event)
+    #      key_or_path = event.payload[:key] || event.payload[:path]
+    #      human_name  = #{method.to_s.humanize.inspect}
+    #      info("\#{human_name} \#{key_or_path} \#{"(%.1fms)" % event.duration}")
+    #    end
+    #  METHOD
+    #end
+
+    private
+
+    def build_payload(event, subscribe)
+      payload = LogSubscribersHelper::build_payload(event, subscribe)
+
+      if redirect_location = Thread.current[:redirect_location]
+        Thread.current[:redirect_location] = nil
+        payload[:redirect_location] = redirect_location
+      end
+
+      payload
     end
   end
 
