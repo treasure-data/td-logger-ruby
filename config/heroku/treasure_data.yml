@@ -1,0 +1,36 @@
+#
+# This file configures the Treasure Data, Hadoop-based cloud data warehouse.
+# For more information, visit http://www.treasure-data.com/.
+#
+production:
+  # Treasure Data API Key
+  # TREASURE_DATA_API_KEY is automatically defined when you add treasure-data
+  # heroku addon.
+  apikey: "<%= ENV['TREASURE_DATA_API_KEY'] %>"
+
+  # Database name
+  # Set this to be the name of your database as you'd like it show up in
+  # `heroku td dbs` command.
+  database: production_db
+
+  # Debug Mode
+  # Less verbose for production environment.
+  debug_mode: false
+
+# For development environment, logging to Treasure Data is disabled by default.
+development:
+  # Treasure Data API Key
+  # `heroku td apikey:show` will retrieve the apikey through Heroku API.
+  # apikey: "<%= `heroku td apikey:show`.strip %>"
+
+  # Database name
+  # Set this to be the name of your database as you'd like it show up in
+  # `heroku td dbs` command.
+  # database: development_db
+
+  # Debug Mode
+  # More verbose tracing is enabled for development environment.
+  # debug_mode: true
+
+# For test environment, logging to Treasure Data is disabled by default.
+test:
