@@ -35,11 +35,27 @@ module Agent::Rails
     #Agent::Rails::AccessLogger.init(c.access_log_table) if c.access_log_enabled?
     #Agent::Rails::ModelExtension.init
 
+    setup_subscribers(rails.td_logger) if rails.td_logger.enabled
+
     true
+  end
+
+  def self.setup_subscribers(conf)
+    conf.subscribers.map(&:to_s).each { |subscriber|
+      begin
+        require "td/logger/agent/rails/log_subscribers/#{subscriber}.rb"
+      rescue
+        warn "LogSubscriber not found: subscriber = #{subscriber}"
+      end
+    }
   end
 
   if ::Rails.respond_to?(:version) && ::Rails.version =~ /^3/
     class Railtie < ::Rails::Railtie
+      config.td_logger = ActiveSupport::OrderedOptions.new
+      config.td_logger.enabled = false
+      config.td_logger.subscribers = [:action_controller, :action_view, :active_record, :active_resource]
+
       initializer "treasure_data_logger.start_plugin" do |app|
         TreasureData::Logger::Agent::Rails.init(app.config)
       end
