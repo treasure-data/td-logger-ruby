@@ -3,25 +3,6 @@ module Logger
 
 
 class TreasureDataLogger < Fluent::Logger::LoggerBase
-  module Finalizable
-    require 'delegate'
-    def new(*args, &block)
-      obj = allocate
-      obj.instance_eval { initialize(*args, &block) }
-      dc = DelegateClass(obj.class).new(obj)
-      ObjectSpace.define_finalizer(obj, finalizer(obj))
-      dc
-    end
-
-    def finalizer(obj)
-      fin = obj.method(:finalize)
-      proc {|id|
-        fin.call
-      }
-    end
-  end
-  extend Finalizable
-
   def initialize(tag_prefix, options={})
     defaults = {
       :auto_create_table => false,
@@ -78,6 +59,10 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     # start thread when the first post() is called for
     # Unicorn and Passenger.
     @upload_thread = nil
+
+    # The calling order of finalizer registered by define_finalizer is indeterminate,
+    # so we should use at_exit instead for memory safety.
+    at_exit { close }
   end
 
   attr_accessor :logger
@@ -342,10 +327,6 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
       end
       retry
     end
-  end
-
-  def finalize
-    close
   end
 
   require 'thread'  # ConditionVariable
