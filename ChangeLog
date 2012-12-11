@@ -1,3 +1,9 @@
+== 2012-12-11 version 0.3.17
+
+* Use at_exit to prevent SEGV on exit. issue #5
+* Add example config for Heroku users
+
+
 == 2012-11-17 version 0.3.16
 
 * Disable logger when the key for the ennvironment is missing. issue #6
