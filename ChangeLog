@@ -1,3 +1,9 @@
+== 2012-12-26 version 0.3.18
+
+* Change msgpack dependency version == 0.4.7 for avoding 0.4.8 yanked issue.
+  issue #8
+
+
 == 2012-12-11 version 0.3.17
 
 * Use at_exit to prevent SEGV on exit. issue #5
