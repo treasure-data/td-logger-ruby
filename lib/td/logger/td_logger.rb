@@ -37,7 +37,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
       @logger.level = ::Logger::INFO
     end
 
-    @client = TreasureData::Client.new(apikey)
+    @client = TreasureData::Client.new(apikey, :ssl => !!options[:use_ssl])
 
     @mutex = Mutex.new
     @cond = ConditionVariable.new

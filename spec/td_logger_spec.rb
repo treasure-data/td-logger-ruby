@@ -3,6 +3,18 @@ require 'spec_helper'
 
 describe TreasureData::Logger::TreasureDataLogger do
   context 'init' do
+    it 'with apikey' do
+      td = TreasureData::Logger::TreasureDataLogger.new('db1', :apikey=>'test_1')
+      td.instance_variable_get(:@client).api.apikey.should == 'test_1'
+      td.instance_variable_get(:@client).api.instance_variable_get(:@ssl).should be_false
+    end
+
+    it 'with apikey and use_ssl' do
+      td = TreasureData::Logger::TreasureDataLogger.new('db1', :apikey=>'test_1', :use_ssl => true)
+      td.instance_variable_get(:@client).api.apikey.should == 'test_1'
+      td.instance_variable_get(:@client).api.instance_variable_get(:@ssl).should be_true
+    end
+
     it 'db config' do
       td = TreasureData::Logger::TreasureDataLogger.new('db1', :apikey=>'test_1')
       time = Time.now
