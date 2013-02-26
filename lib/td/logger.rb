@@ -6,6 +6,10 @@ module Logger
 
   @@logger = nil
 
+  def self.logger
+    @@logger
+  end
+
   def self.open(database, options={})
     @@logger = TreasureData::Logger::TreasureDataLogger.new(database, options)
   end
@@ -16,6 +20,10 @@ module Logger
 
   def self.open_null
     @@logger = Fluent::Logger::NullLogger.new
+  end
+
+  def self.open_test
+    @@logger = Fluent::Logger::TestLogger.new
   end
 
   def self.post(tag, record={})
@@ -33,6 +41,10 @@ end
 module TreasureData
   require 'td/logger/event'
 
+  def self.logger
+    TreasureData::Logger.logger
+  end
+
   def self.open(database, options={})
     TreasureData::Logger.open(database, options)
   end
@@ -43,6 +55,10 @@ module TreasureData
 
   def self.open_null
     TreasureData::Logger.open_null
+  end
+
+  def self.open_test
+    TreasureData::Logger.open_test
   end
 
   def self.post(tag, record={})

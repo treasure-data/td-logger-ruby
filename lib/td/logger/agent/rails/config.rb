@@ -30,12 +30,13 @@ module Agent::Rails
         @debug_mode = !!conf['debug_mode']
       end
 
+      @test_mode = !!conf['test_mode']
       @access_log_table = conf['access_log_table']
     end
 
     attr_reader :agent_host, :agent_port, :tag
     attr_reader :apikey, :database, :auto_create_table
-    attr_reader :access_log_table, :debug_mode
+    attr_reader :access_log_table, :debug_mode, :test_mode
     attr_accessor :disabled
 
     def initialize
@@ -44,6 +45,10 @@ module Agent::Rails
 
     def agent_mode?
       @agent_host != nil
+    end
+
+    def test_mode?
+      @test_mode
     end
 
     def access_log_enabled?

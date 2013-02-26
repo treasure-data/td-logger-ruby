@@ -19,7 +19,9 @@ module Agent::Rails
       return false
     end
 
-    if c.agent_mode?
+    if c.test_mode?
+      ::TreasureData::Logger.open_test
+    elsif c.agent_mode?
       ::TreasureData::Logger.open_agent(c.tag, :host=>c.agent_host, :port=>c.agent_port, :debug=>c.debug_mode)
     else
       ::TreasureData::Logger.open(c.database, :apikey=>c.apikey, :auto_create_table=>c.auto_create_table, :debug=>c.debug_mode)

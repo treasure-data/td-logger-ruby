@@ -88,6 +88,21 @@ NOTE: This configuration is not supported on PaaP platforms.
       tag: td.myapp
       debug_mode: false
 
+=== Test mode
+
+This mode uses TestLogger of fluent-logger-ruby to store the events.
+If you want to enable this mode, then specify 'test_mode' in your configuration.
+
+    development:
+      apikey: "YOUR_API_KEY"
+      database: rails_development
+      debug_mode: true
+      test_mode: true
+
+You can access the logger instance via TD.logger to check the status.
+
+    TD.logger.queue #=> [{},{},..]
+
 == Further Readings
 
 If you have any problem, please ask us from the support site.
