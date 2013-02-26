@@ -134,6 +134,21 @@ EOF
       c.agent_host.should == 'localhost'
       c.agent_port.should == 24224
     end
+
+    it 'test mode' do
+      FileUtils.mkdir_p("#{TMP_DIR}/config")
+      File.open("#{TMP_DIR}/config/treasure_data.yml", "w") {|f|
+        f.write <<EOF
+test:
+  agent: localhost
+  tag: td.db5
+  test_mode: true
+EOF
+      }
+      c = TreasureData::Logger::Agent::Rails::Config.init
+      c.disabled.should == false
+      c.test_mode?.should == true
+    end
   end
 end
 
