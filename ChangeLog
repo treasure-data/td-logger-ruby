@@ -1,3 +1,8 @@
+== 2013-06-17 version 0.3.21
+
+* Update dependent gem versions
+
+
 == 2013-02-26 version 0.3.20
 
 * Use https scheme for rubygems source
