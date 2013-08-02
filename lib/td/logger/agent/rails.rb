@@ -40,7 +40,7 @@ module Agent::Rails
     true
   end
 
-  if ::Rails.respond_to?(:version) && ::Rails.version =~ /^3/
+  if ::Rails.respond_to?(:version) && ::Rails.version.to_i >= 3
     class Railtie < ::Rails::Railtie
       initializer "treasure_data_logger.start_plugin" do |app|
         TreasureData::Logger::Agent::Rails.init(app.config)
