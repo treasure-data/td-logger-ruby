@@ -1,3 +1,8 @@
+== 2013-08-02 version 0.3.22
+
+* Support Rails 4
+
+
 == 2013-06-17 version 0.3.21
 
 * Update dependent gem versions
