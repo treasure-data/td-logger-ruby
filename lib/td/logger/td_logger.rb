@@ -141,6 +141,21 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     @mutex.unlock
   end
 
+  def flush
+    @mutex.lock
+    begin
+      try_flush
+    rescue
+      @logger.error "Unexpected error: #{$!}"
+      $!.backtrace.each {|bt|
+        @logger.info bt
+      }
+    ensure
+      @mutex.unlock
+    end
+  end
+
+
   private
   MAX_KEY_CARDINALITY = 512
   WARN_KEY_CARDINALITY = 256
