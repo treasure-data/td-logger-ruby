@@ -98,6 +98,25 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     end
   end
 
+  def flush
+    @mutex.lock
+
+    # Move small chunks into queue to flush all events.
+    # See try_flush routine for more detail
+    @map.reject! {|(db,table),buffer|
+      data = buffer.flush!
+      @queue << [db, table, data]
+    }
+    try_flush
+  rescue => e
+    @logger.error "Unexpected error at flush: #{e}"
+    e.backtrace.each {|bt|
+      @logger.info bt
+    }
+  ensure
+    @mutex.unlock
+  end
+
   def post_with_time(tag, record, time)
     @logger.debug { "event: #{tag} #{record.to_json}" rescue nil }
 
