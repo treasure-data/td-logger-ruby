@@ -1,3 +1,8 @@
+== 2013-09-20 version 0.3.23
+
+* Add TreasureDataLogger#flush to flush stored events immediatedly
+
+
 == 2013-08-02 version 0.3.22
 
 * Support Rails 4
