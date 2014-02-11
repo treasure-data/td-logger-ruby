@@ -34,6 +34,21 @@ And then add +config/treasure_data.yml+ file as followings. This is a template, 
     
     # disable logging
     test:
+    
+If you would wish to keep your API key as an environment variable, you can use the following template.
+
+    development:
+      apikey: <% ENV['TD_API_KEY'] %>
+      database: rails_development
+      debug_mode: true  # enable debug mode
+     
+    production:
+      apikey: <% ENV['TD_API_KEY'] %>
+      database: rails_production
+      debug_mode: false
+     
+    # disable logging
+    test:
 
 == Logging events
 
