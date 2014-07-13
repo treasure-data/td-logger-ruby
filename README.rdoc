@@ -4,12 +4,12 @@
 
 This gem is a *logging* *library* *for* *Treasure* *Data*. The events logged by this module will be uploaded into the cloud. There're two ways to upload:
 
-* 1) direct upload from applications: app -> cloud (used by default)
-* 2) in-direct upload from td-agent: app -> td-agent -> cloud
+* 1) direct upload from applications: app -> cloud (used by default). This option is easier to configure and setup, but it requires extra memory in the application processes.
+* 2) in-direct upload from td-agent: app -> td-agent -> cloud. This option requires extra steps to install the daemons into your cluster, but lowers the logging impact on your applications. 
 
-(1) is more easy to configure and extra setup, but it requires extra memory in the application processes. (2) requires the extra installation of the daemons into your cluster, but lowers the logging impact to your applications. You can choose whether to use, by config file described laster.
+You can choose which method to use in the config file as described below.
 
-== Getting Started
+== Installation
 
 Add the following line to your Gemfile:
 
@@ -19,8 +19,12 @@ For Rails 2.x (not tested) without Bundler,
 edit +environment.rb+ and add to the initalizer block:
 
     config.gem "td-logger"
+    
+== Configuration file
 
-And then add +config/treasure_data.yml+ file as followings. This is a template, which is doing the direct upload from the application processes.
+=== Direct Upload from Application Buffer
+
+This configuration enables the application to upload the events directly from the application processes (app -> cloud) through the Treasure Data REST APIs. Please add this template +config/treasure_data.yml+ file and set your apikey:
 
     development:
       apikey: "YOUR_API_KEY"
@@ -34,31 +38,37 @@ And then add +config/treasure_data.yml+ file as followings. This is a template, 
     
     # disable logging
     test:
-    
-If you would wish to keep your API key as an environment variable, you can use the following template.
 
-    development:
+If you would wish to keep your API key as an environment variable, you can use this setting:
+
       apikey: <% ENV['TD_API_KEY'] %>
-      database: rails_development
-      debug_mode: true  # enable debug mode
-     
+
+Alternatively, one can initialize the Ruby Logger module for direct upload straight from within the application:
+
+    TreasureData::Logger.open('production',
+                              :apikey=>"YOUR_API_KEY",
+                              :auto_create_table=>true)
+                              
+Please refer to the {Ruby SDK documentation}[http://docs.treasuredata.com/articles/ruby-sdk] for more information.
+
+=== Indirect Upload from td-agent
+
+When 'agent' and 'tag' options are specified, the events are logged into the local td-agent daemon. Later on, the daemon uploads the event periodically to the cloud (app -> td-agent -> cloud).
+
+This requires additional setup steps but lowers the memory and performance impact to your application processes. For the installation process, please look at our {knowledge base}[http://help.treasuredata.com/customer/portal/topics/550539-installing-td-agent/articles] page.
+
+NOTE: This configuration is not supported on PaaS platforms.
+
     production:
-      apikey: <% ENV['TD_API_KEY'] %>
-      database: rails_production
+      agent: "localhost:24224"
+      tag: td.myapp
       debug_mode: false
-     
-    # disable logging
-    test:
-
+      
 == Logging events
 
 You can log anytime using 'TD.event.post' method:
 
-    class MyClass
-      def mymethod
-        TD.event.post('table_name', {:foo=>:bar})
-      end
-    end
+    TD.event.post('table_name', {:foo=>:bar})
 
 == Rails extension
 
@@ -79,30 +89,6 @@ In rails application, you can use 'TD.event.attribute' to set static attribute t
       end
     end
 
-== Configuration file
-
-=== Direct Upload from Application Buffer
-
-This configuration enables the application to upload the events, directly from the application processes (app -> cloud).
-
-    production:
-      apikey: "YOUR_API_KEY"
-      database: rails_production
-      debug_mode: false
-
-=== In-Direct Upload from td-agent
-
-When 'agent' and 'tag' options are specified, the events are logged into the local td-agent daemon. Later on, the daemon uploads the event periodically to the cloud (app -> td-agent -> cloud).
-
-This requires the additional setup to your infrastructure, but lowers the memory and performance impact to your application processes. For the installation process, please look at our {knowledge base}[http://help.treasure-data.com/kb/installing-td-agent-daemon] page.
-
-NOTE: This configuration is not supported on PaaP platforms.
-
-    production:
-      agent: "localhost:24224"
-      tag: td.myapp
-      debug_mode: false
-
 === Test mode
 
 This mode uses TestLogger of fluent-logger-ruby to store the events.
@@ -120,10 +106,8 @@ You can access the logger instance via TD.logger to check the status.
 
 == Further Readings
 
-If you have any problem, please ask us from the support site.
-
-* {Support Site}[http://help.treasure-data.com/]
-* {Knowledge Base}[http://help.treasure-data.com/kb]
+If you have any problem, please consult the knowledge based and ask us on the support site: 
+{Support Site}[http://help.treasure-data.com].
 
 == Copyright
 
