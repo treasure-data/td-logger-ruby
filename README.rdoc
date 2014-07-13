@@ -51,6 +51,13 @@ Alternatively, one can initialize the Ruby Logger module for direct upload strai
                               
 Please refer to the {Ruby SDK documentation}[http://docs.treasuredata.com/articles/ruby-sdk] for more information.
 
+Please note that we recommend to use a write-only API key. To obtain one, please:
+
+1. Login into the Treasure Data Console at http://console.treasuredata.com;
+2. Visit your Profile page at http://console.treasuredata.com/users/current;
+3. Insert your password under the 'API Keys' panel;
+4. In the bottom part of the panel, under 'Write-Only API keys', either copy the API key or click on 'Generate New' and copy the new API key.
+
 === Indirect Upload from td-agent
 
 When 'agent' and 'tag' options are specified, the events are logged into the local td-agent daemon. Later on, the daemon uploads the event periodically to the cloud (app -> td-agent -> cloud).
