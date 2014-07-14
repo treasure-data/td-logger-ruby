@@ -37,6 +37,8 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
       @logger.level = ::Logger::INFO
     end
 
+    # translate :use_ssl to :ssl for backwards compatibility
+    options[:ssl] = options[:use_ssl] unless options[:use_ssl].nil?
     @client = TreasureData::Client.new(apikey, options)
 
     @mutex = Mutex.new
