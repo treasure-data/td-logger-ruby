@@ -37,14 +37,14 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
       @logger.level = ::Logger::INFO
     end
 
-    @client = TreasureData::Client.new(apikey, :ssl => !!options[:use_ssl])
+    @client = TreasureData::Client.new(apikey, options)
 
     @mutex = Mutex.new
     @cond = ConditionVariable.new
     @map = {}  # (db,table) => buffer:String
     @queue = []
 
-    @chunk_limit = 8*1024*1024
+    @chunk_limit = 8 * 1024 * 1024
     @queue_limit = 50
 
     @flush_interval = 2
