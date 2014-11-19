@@ -22,7 +22,7 @@ EOF
   gem.authors     = ["Sadayuki Furuhashi"]
   #gem.email       = %q{frsyuki@gmail.com}
   #gem.homepage    = %q{https://github.com/treasure-data/td-logger-ruby}
-  gem.description = %q{Treasure Data logging library for Rails}
+  gem.description = %q{Treasure Data logging library}
   gem.summary     = gem.description
 
   gem.files         = `git ls-files`.split("\n")
@@ -31,8 +31,8 @@ EOF
   gem.require_paths = ['lib']
 
   gem.add_dependency "msgpack", [">= 0.4.4", "!= 0.5.0", "!= 0.5.1", "!= 0.5.2", "!= 0.5.3", "< 0.6.0"]
-  gem.add_dependency "td-client", "~> 0.8.51"
-  gem.add_dependency "fluent-logger", "~> 0.4.6"
+  gem.add_dependency "td-client", "~> 0.10.66"
+  gem.add_dependency "fluent-logger", "~> 0.4.9"
   gem.add_development_dependency 'rake', '>= 0.9.2'
   gem.add_development_dependency 'rspec', '>= 2.7.0'
 end
