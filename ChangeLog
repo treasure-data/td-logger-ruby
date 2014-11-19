@@ -1,3 +1,9 @@
+== 2014-11-18 version 0.3.24
+
+* Pass all option hash's arguments to the td-client library to support
+  switching of API endpoints
+
+
 == 2013-09-20 version 0.3.23
 
 * Add TreasureDataLogger#flush to flush stored events immediatedly
