@@ -41,7 +41,7 @@ This configuration enables the application to upload the events directly from th
 
 If you would wish to keep your API key as an environment variable, you can use this setting:
 
-      apikey: <% ENV['TD_API_KEY'] %>
+      apikey: <%= ENV['TD_API_KEY'] %>
 
 Alternatively, one can initialize the Ruby Logger module for direct upload straight from within the application:
 
