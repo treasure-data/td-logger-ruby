@@ -6,19 +6,19 @@ describe TreasureData::Logger::TreasureDataLogger do
     it 'with apikey' do
       td = TreasureData::Logger::TreasureDataLogger.new('db1', :apikey => 'test_1')
       td.instance_variable_get(:@client).api.apikey.should == 'test_1'
-      td.instance_variable_get(:@client).api.instance_variable_get(:@ssl).should be_false
+      td.instance_variable_get(:@client).api.instance_variable_get(:@ssl).should == false
     end
 
     it 'with apikey and use_ssl' do
       td = TreasureData::Logger::TreasureDataLogger.new('db1', :apikey => 'test_1', :use_ssl => true)
       td.instance_variable_get(:@client).api.apikey.should == 'test_1'
-      td.instance_variable_get(:@client).api.instance_variable_get(:@ssl).should be_true
+      td.instance_variable_get(:@client).api.instance_variable_get(:@ssl).should == true
     end
 
     it 'with apikey and ssl' do
       td = TreasureData::Logger::TreasureDataLogger.new('db1', :apikey => 'test_1', :ssl => true)
       td.instance_variable_get(:@client).api.apikey.should == 'test_1'
-      td.instance_variable_get(:@client).api.instance_variable_get(:@ssl).should be_true
+      td.instance_variable_get(:@client).api.instance_variable_get(:@ssl).should == true
     end
 
     it 'with apikey and HTTP endpoint' do
@@ -26,7 +26,7 @@ describe TreasureData::Logger::TreasureDataLogger do
       td.instance_variable_get(:@client).api.apikey.should == 'test_1'
       td.instance_variable_get(:@client).api.instance_variable_get(:@host).should == "idontexi.st"
       td.instance_variable_get(:@client).api.instance_variable_get(:@port).should == 80
-      td.instance_variable_get(:@client).api.instance_variable_get(:@ssl).should be_false
+      td.instance_variable_get(:@client).api.instance_variable_get(:@ssl).should == false
     end
 
     it 'with apikey and HTTPS endpoint' do
@@ -34,7 +34,7 @@ describe TreasureData::Logger::TreasureDataLogger do
       td.instance_variable_get(:@client).api.apikey.should == 'test_1'
       td.instance_variable_get(:@client).api.instance_variable_get(:@host).should == "idontexi.st"
       td.instance_variable_get(:@client).api.instance_variable_get(:@port).should == 443
-      td.instance_variable_get(:@client).api.instance_variable_get(:@ssl).should be_true
+      td.instance_variable_get(:@client).api.instance_variable_get(:@ssl).should == true
     end
 
     it 'db config' do

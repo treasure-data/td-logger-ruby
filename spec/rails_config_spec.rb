@@ -154,6 +154,6 @@ end
 
 describe ActiveSupport::TimeWithZone do
   it 'has to_msgpack' do
-    ActiveSupport::TimeWithZone.method_defined?(:to_msgpack).should be_true
+    ActiveSupport::TimeWithZone.method_defined?(:to_msgpack).should == true
   end
 end
