@@ -35,4 +35,5 @@ EOF
   gem.add_dependency "fluent-logger", "~> 0.4.9"
   gem.add_development_dependency 'rake', '>= 0.9.2'
   gem.add_development_dependency 'rspec', '~> 3.0'
+  gem.add_development_dependency 'coveralls'
 end
