@@ -56,11 +56,11 @@ describe TreasureData::Logger::Agent::Rails::Config do
       ENV['TREASURE_DATA_API_KEY'] = 'test1'
       ENV['TREASURE_DATA_DB'] = 'db1'
       c = TreasureData::Logger::Agent::Rails::Config.init
-      c.disabled.should == false
-      c.agent_mode?.should == false
-      c.apikey.should == 'test1'
-      c.database.should == 'db1'
-      c.auto_create_table.should == true
+      expect(c.disabled).to eq(false)
+      expect(c.agent_mode?).to eq(false)
+      expect(c.apikey).to eq('test1')
+      expect(c.database).to eq('db1')
+      expect(c.auto_create_table).to eq(true)
     end
 
     it 'load_file' do
@@ -74,12 +74,12 @@ test:
 EOF
       }
       c = TreasureData::Logger::Agent::Rails::Config.init
-      c.disabled.should == false
-      c.agent_mode?.should == false
-      c.apikey.should == 'test2'
-      c.database.should == 'db2'
-      c.auto_create_table.should == true
-      c.debug_mode.should == true
+      expect(c.disabled).to eq(false)
+      expect(c.agent_mode?).to eq(false)
+      expect(c.apikey).to eq('test2')
+      expect(c.database).to eq('db2')
+      expect(c.auto_create_table).to eq(true)
+      expect(c.debug_mode).to eq(true)
     end
 
     it 'load_file without test' do
@@ -93,7 +93,7 @@ development:
 EOF
       }
       c = TreasureData::Logger::Agent::Rails::Config.init
-      c.disabled.should == true
+      expect(c.disabled).to eq(true)
     end
 
     it 'prefer file than env' do
@@ -110,12 +110,12 @@ test:
 EOF
       }
       c = TreasureData::Logger::Agent::Rails::Config.init
-      c.disabled.should == false
-      c.agent_mode?.should == false
-      c.apikey.should == 'test4'
-      c.database.should == 'db4'
-      c.auto_create_table.should == false
-      c.debug_mode.should == false
+      expect(c.disabled).to eq(false)
+      expect(c.agent_mode?).to eq(false)
+      expect(c.apikey).to eq('test4')
+      expect(c.database).to eq('db4')
+      expect(c.auto_create_table).to eq(false)
+      expect(c.debug_mode).to eq(false)
     end
 
     it 'agent mode' do
@@ -128,11 +128,11 @@ test:
 EOF
       }
       c = TreasureData::Logger::Agent::Rails::Config.init
-      c.disabled.should == false
-      c.agent_mode?.should == true
-      c.tag.should == 'td.db5'
-      c.agent_host.should == 'localhost'
-      c.agent_port.should == 24224
+      expect(c.disabled).to eq(false)
+      expect(c.agent_mode?).to eq(true)
+      expect(c.tag).to eq('td.db5')
+      expect(c.agent_host).to eq('localhost')
+      expect(c.agent_port).to eq(24224)
     end
 
     it 'test mode' do
@@ -146,14 +146,14 @@ test:
 EOF
       }
       c = TreasureData::Logger::Agent::Rails::Config.init
-      c.disabled.should == false
-      c.test_mode?.should == true
+      expect(c.disabled).to eq(false)
+      expect(c.test_mode?).to eq(true)
     end
   end
 end
 
 describe ActiveSupport::TimeWithZone do
   it 'has to_msgpack' do
-    ActiveSupport::TimeWithZone.method_defined?(:to_msgpack).should == true
+    expect(ActiveSupport::TimeWithZone.method_defined?(:to_msgpack)).to eq(true)
   end
 end
