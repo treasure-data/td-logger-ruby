@@ -4,6 +4,8 @@ Coveralls.wear!('test_frameworks')
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 
+REPO_ROOT = Pathname.new(File.expand_path("../", __FILE__))
+
 require 'td-logger'
 
 RSpec.configure do |config|

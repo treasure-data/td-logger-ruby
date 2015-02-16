@@ -3,7 +3,7 @@ require 'spec_helper'
 require 'fileutils'
 require 'logger'
 
-TMP_DIR = File.dirname(__FILE__) + "/tmp"
+TMP_DIR = REPO_ROOT.join("tmp")
 FileUtils.rm_rf(TMP_DIR)
 
 class Rails
