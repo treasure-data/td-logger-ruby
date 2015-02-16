@@ -211,6 +211,8 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
   end
 
   def add(db, table, msg)
+    # NOTE: TreasureData::API is defined at td-client-ruby gem
+    #       https://github.com/treasure-data/td-client-ruby/blob/master/lib/td/client/api.rb
     begin
       TreasureData::API.validate_database_name(db)
     rescue
