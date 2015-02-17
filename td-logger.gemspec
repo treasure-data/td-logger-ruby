@@ -36,4 +36,5 @@ EOF
   gem.add_development_dependency 'rake', '>= 0.9.2'
   gem.add_development_dependency 'rspec', '~> 3.0'
   gem.add_development_dependency 'coveralls'
+  gem.add_development_dependency 'rack'
 end

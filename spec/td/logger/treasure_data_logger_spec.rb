@@ -79,5 +79,80 @@ describe TreasureData::Logger::TreasureDataLogger do
       }.to raise_error(RuntimeError)
     end
   end
+
+  it "raise error if `apikey` option is missing" do
+    expect{ described_class.new("dummy-tag", {}) }.to raise_error(ArgumentError)
+  end
+
+  describe "#logger" do
+    let(:tag_prefix) { "dummy" }
+
+    subject { described_class.new(tag_prefix, {apikey: "dummy"}.merge(options)).logger }
+
+    context "`debug` option given" do
+      let(:options) { {debug: true} }
+
+      it { expect(subject.level).to eq ::Logger::DEBUG }
+    end
+
+    context "not `debug` option given" do
+      let(:options) { {} }
+
+      it { expect(subject.level).to eq ::Logger::INFO }
+    end
+  end
+
+  describe "#post_with_time" do
+    let(:td) { described_class.new(prefix, {apikey: 'test_1'}.merge(options)) }
+    let(:tag) { "foo.bar" }
+    let(:time) { Time.now }
+    let(:prefix) { "dummy" }
+    let(:record) { {greeting: "hello", time: 1234567890} }
+    let(:options) { {} }
+
+    subject { td.post_with_time(tag, record, time) }
+
+    describe "db and table" do
+      context "no `tag_prefix` option given" do
+        let(:prefix) { "" }
+
+        it "`db` and `table` determine with tag" do
+          db, table = tag.split(".")[-2, 2]
+          allow(td).to receive(:add).with(db, table, record)
+          subject
+        end
+      end
+
+      context "`tag_prefix` option given" do
+        let(:prefix) { "prefix" }
+
+        it "`db` and `table` determine with tag and tag_prefix" do
+          db, table = "#{prefix}.#{tag}".split(".")[-2, 2]
+          allow(td).to receive(:add).with(db, table, record)
+          subject
+        end
+      end
+    end
+
+    describe "inject time to record" do
+      context "record has no `:time` key" do
+        let(:record) { {greeting: "hello"} }
+
+        it "fill-in :time key with `time` argument" do
+          allow(td).to receive(:add).with(anything, anything, record.merge(time: time.to_i))
+          subject
+        end
+      end
+
+      context "record has `:time` key" do
+        let(:record) { {greeting: "hello", time: 1234567890 } }
+
+        it do
+          allow(td).to receive(:add).with(anything, anything, record)
+          subject
+        end
+      end
+    end
+  end
 end
 
