@@ -1,5 +1,8 @@
 = Treasure Data logging library for Rails
 
+{<img src="https://travis-ci.org/treasure-data/td-logger-ruby.svg?branch=master" alt="Build Status" />}[https://travis-ci.org/treasure-data/td-logger-ruby]
+{<img src="https://coveralls.io/repos/treasure-data/td-logger-ruby/badge.svg?branch=master" alt="Coverage Status" />}[https://coveralls.io/r/treasure-data/td-logger-ruby?branch=master]
+
 == About
 
 This gem is a *logging* *library* *for* *Treasure* *Data*. The events logged by this module will be uploaded into the cloud. There're two ways to upload:
