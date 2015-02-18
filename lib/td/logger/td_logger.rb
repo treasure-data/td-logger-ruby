@@ -256,7 +256,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
         @map.delete(key)
         return false
       end
-      if before <= WARN_KEY_CARDINALITY && after > WARN_KEY_CARDINALITY # NOTE: possible `before` value != 0 ?
+      if before <= WARN_KEY_CARDINALITY && after > WARN_KEY_CARDINALITY
         @logger.warn("TreasureDataLogger: kind of keys in a buffer exceeds #{WARN_KEY_CARDINALITY} which is too large. please check the schema design.")
       end
 
