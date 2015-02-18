@@ -1,5 +1,16 @@
-require 'coveralls'
-Coveralls.wear!('test_frameworks')
+if defined?(:RUBY_ENGINE) && RUBY_ENGINE == 'ruby'
+  # SimpleCov officially supports MRI 1.9+ only for now
+  # https://github.com/colszowka/simplecov#ruby-version-compatibility
+
+  require 'simplecov'
+  require 'coveralls'
+
+  SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+    SimpleCov::Formatter::HTMLFormatter,
+    Coveralls::SimpleCov::Formatter
+  ]
+  SimpleCov.start("test_frameworks")
+end
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
