@@ -32,7 +32,7 @@ EOF
 
   gem.add_dependency "msgpack", [">= 0.4.4", "!= 0.5.0", "!= 0.5.1", "!= 0.5.2", "!= 0.5.3", "< 0.6.0"]
   gem.add_dependency "td-client", "~> 0.8.66"
-  gem.add_dependency "fluent-logger", "~> 0.4.9"
+  gem.add_dependency "fluent-logger", "~> 0.5.0"
   gem.add_development_dependency 'rake', '>= 0.9.2'
   gem.add_development_dependency 'rspec', '~> 3.0'
   gem.add_development_dependency 'coveralls'
