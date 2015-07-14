@@ -8,7 +8,7 @@
 This gem is a *logging* *library* *for* *Treasure* *Data*. The events logged by this module will be uploaded into the cloud. There're two ways to upload:
 
 * *direct* *upload* *from* *applications*: app -> cloud. This option is easier to configure and setup, but it requires extra memory in the application processes. The data is logged directly in the Treasure Data Cloud through the REST APIs by leveraging the {Treasure Data Ruby Client (td-client-ruby)}[https://github.com/treasure-data/td-client-ruby] library.
-* *in-direct* *upload* *from* *td-agent*: app -> td-agent -> cloud. This option requires extra steps to install the daemons into your cluster, but lowers the logging impact on your applications. The data is sent to a td-agent running either locally or remotely by leveraging the {Fluentd Ruby Logger (fluent-logger-ruby)}[https://github.com/fluent/fluent-logger-ruby/] library.
+* *indirect* *upload* *from* *td-agent*: app -> td-agent -> cloud. This option requires extra steps to install the daemons into your cluster, but lowers the logging impact on your applications. The data is sent to a td-agent running either locally or remotely by leveraging the {Fluentd Ruby Logger (fluent-logger-ruby)}[https://github.com/fluent/fluent-logger-ruby/] library.
 
 The actual upload method can be selected in the config file as described below.
 
