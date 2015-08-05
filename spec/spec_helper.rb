@@ -3,12 +3,14 @@ if defined?(:RUBY_ENGINE) && RUBY_ENGINE == 'ruby'
   # https://github.com/colszowka/simplecov#ruby-version-compatibility
 
   require 'simplecov'
-  require 'coveralls'
+  unless ENV['APPVEYOR']
+    require 'coveralls'
 
-  SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
-    SimpleCov::Formatter::HTMLFormatter,
-    Coveralls::SimpleCov::Formatter
-  ]
+    SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+      SimpleCov::Formatter::HTMLFormatter,
+      Coveralls::SimpleCov::Formatter
+    ]
+  end
   SimpleCov.start("test_frameworks")
 end
 
