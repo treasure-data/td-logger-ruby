@@ -334,7 +334,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     begin
       stream = StringIO.new(data)
 
-      @logger.debug "Uploading event logs to #{db}.#{table} table on Treasure Data (#{stream.size} bytes)"
+      @logger.info "Uploading event logs to #{db}.#{table} table on Treasure Data (#{stream.size} bytes)"
 
       @client.import(db, table, "msgpack.gz", stream, stream.size)
     rescue TreasureData::NotFoundError
