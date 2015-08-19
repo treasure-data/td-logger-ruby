@@ -342,9 +342,20 @@ describe TreasureData::Logger::TreasureDataLogger do
     subject { td.send(:upload, db, table, message.to_msgpack) } # NOTE: `upload` is private method
 
     describe "TreasureDataLogger::Client#import success" do
-      it do
-        expect(td.instance_variable_get(:@client)).to receive(:import).with(db, table, "msgpack.gz", anything, anything)
-        subject
+      context 'unuse unique_key' do
+        it do
+          expect(td.instance_variable_get(:@client)).to receive(:import).with(db, table, "msgpack.gz", anything, anything, nil)
+          subject
+        end
+      end
+
+      context 'use unique_key' do
+        let(:options) { {apikey: "apike", use_unique_key: true} }
+
+        it do
+          expect(td.instance_variable_get(:@client)).to receive(:import).with(db, table, "msgpack.gz", anything, anything, kind_of(String))
+          subject
+        end
       end
     end
 
