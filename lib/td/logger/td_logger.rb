@@ -62,6 +62,8 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     # Unicorn and Passenger.
     @upload_thread = nil
 
+    @use_unique_key = options[:use_unique_key]
+
     # The calling order of finalizer registered by define_finalizer is indeterminate,
     # so we should use at_exit instead for memory safety.
     at_exit { close }
@@ -331,12 +333,14 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
   end
 
   def upload(db, table, data)
+    unique_key = @use_unique_key ? generate_unique_key : nil
+
     begin
       stream = StringIO.new(data)
 
       @logger.debug "Uploading event logs to #{db}.#{table} table on Treasure Data (#{stream.size} bytes)"
 
-      @client.import(db, table, "msgpack.gz", stream, stream.size)
+      @client.import(db, table, "msgpack.gz", stream, stream.size, unique_key)
     rescue TreasureData::NotFoundError
       unless @auto_create_table
         raise $!
@@ -350,6 +354,15 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
       end
       retry
     end
+  end
+
+  # NOTE fluentd unique_id and fluent-plugin-td unique_str in reference.
+  #      https://github.com/fluent/fluentd/blob/v0.12.15/lib/fluent/plugin/buf_memory.rb#L22
+  #      https://github.com/treasure-data/fluent-plugin-td/blob/v0.10.27/lib/fluent/plugin/out_tdlog.rb#L225
+  def generate_unique_key(now = Time.now)
+    u1 = ((now.to_i*1000*1000+now.usec) << 12 | rand(0xfff))
+    uid = [u1 >> 32, u1 & 0xffffffff, rand(0xffffffff), rand(0xffffffff)].pack('NNNN')
+    uid.unpack('C*').map { |x| "%02x" % x }.join
   end
 
   require 'thread'  # ConditionVariable
