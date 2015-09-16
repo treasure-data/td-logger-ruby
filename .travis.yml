@@ -9,6 +9,8 @@ rvm:
   - rbx
   - jruby-1.7.20
 
+sudo: false
+
 branches:
   only:
     - master
@@ -23,3 +25,6 @@ matrix:
     - rvm: ruby-head
     - rvm: rbx
     - rvm: jruby-1.7.20
+
+notifications:
+  webhooks: http://td-beda.herokuapp.com/travisci_callback
