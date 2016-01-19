@@ -46,11 +46,11 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     @map = {}  # (db,table) => buffer:String
     @queue = []
 
-    @chunk_limit = 8 * 1024 * 1024
+    @chunk_limit = options[:chunk_limit] || 8 * 1024 * 1024
     @queue_limit = 50
 
-    @flush_interval = 2
-    @max_flush_interval = 300
+    @flush_interval = options[:flush_interval] || 2
+    @max_flush_interval = options[:max_flush_interval] || 300
     @retry_wait = 1.0
     @retry_limit = 12
 
