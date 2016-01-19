@@ -1,7 +1,7 @@
 module TreasureData
 module Logger
 
-VERSION = '0.3.24'
+VERSION = '0.3.25'
 
 end
 end
