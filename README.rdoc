@@ -75,7 +75,15 @@ NOTE: This configuration is not supported on PaaS platforms.
       agent: "localhost:24224"
       tag: td.myapp
       debug_mode: false
-      
+
+Alternatively, one can initialize the Ruby Logger module for indirect upload within the application:
+
+    TreasureData::Logger.open_agent('td.myapp',
+                                    :host => 'localhost',
+                                    :port => 24224)
+
+The arguments of the 'open_agent' function correspond to the configuration option of the underlying {Fluentd Ruby Logger (fluent-logger-ruby)}[https://github.com/fluent/fluent-logger-ruby/] library.
+
 == Logging events
 
 You can log anytime using 'TD.event.post' method:
