@@ -67,7 +67,7 @@ Please note that we recommend to use a write-only API key. To obtain one, please
 
 When the 'agent' and 'tag' options are specified, the events are logged into the local td-agent daemon. Later on, the daemon uploads the event periodically to the cloud (app -> td-agent -> cloud).
 
-This requires additional setup steps but lowers the memory and performance impact to your application processes. For the installation process, please look at our {knowledge base}[http://help.treasuredata.com/customer/portal/topics/550539-installing-td-agent/articles] page.
+This requires additional setup steps but lowers the memory and performance impact to your application processes. For the installation process, please look at the section {"How to Install Treasure Agent?"}[https://docs.treasuredata.com/articles/td-agent#how-to-install-treasure-agent] on "Quickstart Guide".
 
 NOTE: This configuration is not supported on PaaS platforms.
 
@@ -118,8 +118,7 @@ You can access the logger instance via TD.logger to check the status.
 
 == Further Readings
 
-If you have any problem, please consult the knowledge based and ask us on the support site: 
-{Support Site}[http://help.treasure-data.com].
+If you have any problem, please refer our {document site}[https://docs.treasuredata.com/].
 
 == Copyright
 
