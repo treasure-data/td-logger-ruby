@@ -36,5 +36,10 @@ EOF
   gem.add_development_dependency 'rake', '>= 0.9.2'
   gem.add_development_dependency 'rspec', '~> 3.0'
   gem.add_development_dependency 'coveralls'
-  gem.add_development_dependency 'rack'
+  ruby_version = Gem::Version.new(RUBY_VERSION)
+  if ruby_version >= Gem::Version.new('2.2.2')
+    gem.add_development_dependency 'rack'
+  else
+    gem.add_development_dependency 'rack', '~> 1.0'
+  end
 end
