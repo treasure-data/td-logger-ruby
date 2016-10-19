@@ -6,7 +6,7 @@ describe TreasureData::Logger::TreasureDataLogger do
     it 'with apikey' do
       td = TreasureData::Logger::TreasureDataLogger.new('db1', :apikey => 'test_1')
       expect(td.instance_variable_get(:@client).api.apikey).to eq('test_1')
-      expect(td.instance_variable_get(:@client).api.instance_variable_get(:@ssl)).to eq(false)
+      expect(td.instance_variable_get(:@client).api.instance_variable_get(:@ssl)).to eq(true)
     end
 
     it 'with apikey and use_ssl' do
