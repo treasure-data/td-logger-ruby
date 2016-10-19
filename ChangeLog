@@ -1,3 +1,8 @@
+== 2016-10-19 version 0.3.26
+
+* Allow msgpack v1.x
+
+
 == 2016-01-19 version 0.3.25
 
 * can use unique_key when post td
