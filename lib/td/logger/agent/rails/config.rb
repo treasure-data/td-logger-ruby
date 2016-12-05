@@ -38,9 +38,11 @@ module Agent::Rails
     attr_reader :apikey, :database, :auto_create_table
     attr_reader :access_log_table, :debug_mode, :test_mode
     attr_accessor :disabled
+    attr_reader :show_warning
 
     def initialize
       @disabled = false
+      @show_warning = ENV.fetch("DISABLE_WARNING") { true }
     end
 
     def agent_mode?
@@ -71,7 +73,7 @@ module Agent::Rails
 
       return c
     rescue
-      warn "Disabling Treasure Data event logger: #{$!}"
+      warn "Disabling Treasure Data event logger: #{$!}" if c.show_warning
       c.disabled = true
       return c
     end
