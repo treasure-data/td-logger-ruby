@@ -1,3 +1,8 @@
+== 2017-04-26 version 0.3.27
+
+* Allow td-client v1.x
+
+
 == 2016-10-19 version 0.3.26
 
 * Allow msgpack v1.x
