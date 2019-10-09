@@ -3,10 +3,21 @@ require 'spec_helper'
 
 describe TreasureData::Logger::TreasureDataLogger do
   context 'init' do
-    it 'with apikey' do
-      td = TreasureData::Logger::TreasureDataLogger.new('db1', :apikey => 'test_1')
-      expect(td.instance_variable_get(:@client).api.apikey).to eq('test_1')
-      expect(td.instance_variable_get(:@client).api.instance_variable_get(:@ssl)).to eq(true)
+    require 'td-client'
+    if  Gem::Version.create(TreasureData::Client::VERSION) > Gem::Version.create('0.8.83')
+      it 'with apikey' do
+        td = TreasureData::Logger::TreasureDataLogger.new('db1', :apikey => 'test_1')
+        expect(td.instance_variable_get(:@client).api.apikey).to eq('test_1')
+        expect(td.instance_variable_get(:@client).api.instance_variable_get(:@ssl)).to eq(true)
+      end
+    else
+      # for backward compatibility.
+      # Ruby '~> 2.0.0' depends on td-client-ruby '<= 0.8.83' and SSL is disabled by default in these versions.
+      it 'with apikey (Not HTTPS but HTTP was to be used as the default protocol in old td-client-ruby)' do
+        td = TreasureData::Logger::TreasureDataLogger.new('db1', :apikey => 'test_1')
+        expect(td.instance_variable_get(:@client).api.apikey).to eq('test_1')
+        expect(td.instance_variable_get(:@client).api.instance_variable_get(:@ssl)).to eq(false)
+      end
     end
 
     it 'with apikey and use_ssl' do
