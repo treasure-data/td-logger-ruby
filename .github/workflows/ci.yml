@@ -2,7 +2,6 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
 
 jobs:
   test:
@@ -12,16 +11,22 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - windows-latest
-          - macos-latest
         ruby:
-          - 2.0.0-p648
-          - 2.1.10
-          - 2.2.5
           - 2.3.1
           - 2.4.1
-          - ruby-head
-          - jruby-9.1.5.0
+          - 2.5.9
+          - 2.6.9
+          - 2.7.5
+          - 3.0.3
+          - 3.1.0
+          - head
+        # TODO: Add jruby
+        include:
+          - os: windows-latest
+            ruby: 2.7.5
+          - os: macos-latest
+            ruby: 2.7.5
+
 
     steps:
       - uses: actions/checkout@v2
