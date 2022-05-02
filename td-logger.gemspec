@@ -24,6 +24,7 @@ EOF
   #gem.homepage    = %q{https://github.com/treasure-data/td-logger-ruby}
   gem.description = %q{Treasure Data logging library}
   gem.summary     = gem.description
+  gem.licenses    = ["Apache-2.0"]
 
   gem.files         = `git ls-files`.split("\n")
   gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
