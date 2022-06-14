@@ -121,12 +121,12 @@ module Agent::Rails
     end
 
     def load_yaml(path)
-      require 'yaml'
+      require 'td/logger/agent/rails/yaml'
       require 'erb'
 
       src = File.read(path)
       yaml = ERB.new(src).result
-      YAML.load(yaml)
+      YAML.unsafe_load(yaml)
     end
   end
 
