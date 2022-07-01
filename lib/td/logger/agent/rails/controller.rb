@@ -4,7 +4,10 @@ module Agent::Rails
   module ControllerExtension
 
     def self.init
-      ::ActionController::Base.send(:include, self)
+      mdl = self
+      ActiveSupport.on_load :action_controller do
+        ::ActionController::Base.send(:include, mdl)
+      end
     end
 
     def self.included(mod)
