@@ -32,7 +32,7 @@ EOF
   gem.require_paths = ['lib']
 
   gem.add_dependency "msgpack", ">= 0.5.6", "< 2.0"
-  gem.add_dependency "td-client", ">= 0.8.66", "< 2.0"
+  gem.add_dependency "td-client", ">= 1.0.8", "< 3.0"
   gem.add_dependency "fluent-logger", ">= 0.5.0", "< 2.0"
   gem.add_development_dependency 'rake', '>= 0.9.2'
   gem.add_development_dependency 'rspec', '~> 3.0'
