@@ -6,10 +6,10 @@ if defined?(:RUBY_ENGINE) && RUBY_ENGINE == 'ruby'
   unless ENV['APPVEYOR']
     require 'coveralls'
 
-    SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+    SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
       SimpleCov::Formatter::HTMLFormatter,
       Coveralls::SimpleCov::Formatter
-    ]
+    ])
   end
   SimpleCov.start("test_frameworks")
 end
