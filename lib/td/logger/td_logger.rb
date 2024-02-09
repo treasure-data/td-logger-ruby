@@ -29,6 +29,7 @@ class TreasureDataLogger < Fluent::Logger::LoggerBase
     require 'cgi'
     require 'logger'
     require 'td-client'
+    require 'mutex_m'
 
     @logger = ::Logger.new(STDERR)
     if debug
