@@ -25,7 +25,7 @@ module Logger
 
     def pay(category, sub_category, name, price, count, uid=TD.event.attribute[:uid])
       unless uid
-        raise ArgumentError, "wrong number of arguments (3 for 4): :uid attribute is required"
+        raise ArgumentError, "wrong number of arguments (5 for 6): :uid attribute is required"
       end
       action(:pay, {:category=>category, :sub_category=>sub_category, :name=>name, :price=>price, :count=>count}, uid)
     end
