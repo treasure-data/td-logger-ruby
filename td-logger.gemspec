@@ -35,6 +35,7 @@ EOF
   gem.add_dependency "td-client", ">= 1.0.8", "< 3.0"
   gem.add_dependency "fluent-logger", ">= 0.5.0", "< 2.0"
   gem.add_dependency "mutex_m", ">= 0.2.0", "< 1.0"
+  gem.add_dependency "logger"
   gem.add_development_dependency 'rake', '>= 0.9.2'
   gem.add_development_dependency 'rspec', '~> 3.0'
   gem.add_development_dependency 'coveralls'
