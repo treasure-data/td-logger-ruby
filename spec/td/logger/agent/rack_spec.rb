@@ -1,5 +1,6 @@
 require 'spec_helper'
 require "rack/mock"
+require 'rack/builder'
 require 'td/logger/agent/rack'
 
 describe TreasureData::Logger::Agent::Rack::Hook do
