@@ -23,9 +23,9 @@ jobs:
         # TODO: Add jruby
         include:
           - os: windows-latest
-            ruby: 2.7.5
+            ruby: '2.7'
           - os: macos-latest
-            ruby: 2.7.5
+            ruby: '2.7'
 
 
     steps:
