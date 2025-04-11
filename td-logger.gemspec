@@ -26,9 +26,17 @@ EOF
   gem.summary     = gem.description
   gem.licenses    = ["Apache-2.0"]
 
-  gem.files         = `git ls-files`.split("\n")
-  gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  # Specify which files should be added to the gem when it is released.
+  # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
+  gemspec = File.basename(__FILE__)
+  gem.files = IO.popen(%w[git ls-files -z], chdir: __dir__, err: IO::NULL) do |ls|
+    ls.readlines("\x0", chomp: true).reject do |f|
+      (f == gemspec) ||
+        f.start_with?(*%w[bin/ test/ spec/ features/ .git appveyor Gemfile Rakefile .coveralls])
+    end
+  end
+  gem.bindir = "exe"
+  gem.executables = gem.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   gem.require_paths = ['lib']
 
   gem.add_dependency "msgpack", ">= 0.5.6", "< 2.0"
