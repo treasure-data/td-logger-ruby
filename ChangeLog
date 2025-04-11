@@ -1,3 +1,7 @@
+== 2025-04-11 version 0.3.29
+
+* Support Ruby 2.7 to 3.4
+
 == 2022-06-23 version 0.3.28
 
 * Support Ruby 3.1 (psych 4.0): Allow loading configuration files (tresure_data.yml) which have YAML aliases.
