@@ -24,6 +24,7 @@ EOF
   #gem.homepage    = %q{https://github.com/treasure-data/td-logger-ruby}
   gem.description = %q{Treasure Data logging library}
   gem.summary     = gem.description
+  gem.required_ruby_version = '>= 2.7.0' if RUBY_ENGINE != 'jruby'
   gem.licenses    = ["Apache-2.0"]
 
   # Specify which files should be added to the gem when it is released.

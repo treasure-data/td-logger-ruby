@@ -1,3 +1,11 @@
+== 2025-04-14 version 0.4.0
+
+* Require Ruby 2.7 or higher. Support for versions earlier than 2.7 has been removed.
+* Require td-client v1.0.8+
+* Allow td-client v2.x
+* Add mutex_m gem for Ruby 3.3+
+* Add logger gem
+
 == 2022-06-23 version 0.3.28
 
 * Support Ruby 3.1 (psych 4.0): Allow loading configuration files (tresure_data.yml) which have YAML aliases.
