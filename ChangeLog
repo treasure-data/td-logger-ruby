@@ -1,3 +1,7 @@
+== 2025-05-08 version 0.5.0
+
+* Add support for td-client v3.x
+
 == 2025-04-14 version 0.4.0
 
 * Require Ruby 2.7 or higher. Support for versions earlier than 2.7 has been removed.
